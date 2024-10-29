@@ -1,14 +1,21 @@
-const Sequelize = require('sequelize');
+const { sequelize, initModels } = require('./Models');
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv')
+const app = express();
+const port = process.env.PORT || 3000;
 
-const sequelize = new Sequelize('uniaid_db', 'root', 'toor', {
-    host: 'localhost',
-    port: 3306,
-    dialect: 'mysql'
+dotenv.config();
+
+const corsOptions = {
+    origin: "*"
+}
+
+initModels();
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
 
-sequelize.authenticate().then(() => {
-    console.log('Connection has been established successfully.');
-}).catch((error) => {
-    console.error('Error connecting to the database:', error);
-});
-
+app.use(cors());
+app.use(express.json());
