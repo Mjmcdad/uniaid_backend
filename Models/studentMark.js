@@ -26,7 +26,15 @@ const StudentMark = sequelize.define('StudentMark', {
     assignmentMark: {
         type: DataTypes.FLOAT,
         allowNull: false
-    }
+    },
+    totalMark: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            max:100
+        }
+    } 
 });
 
 module.exports = StudentMark;

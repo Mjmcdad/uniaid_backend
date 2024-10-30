@@ -13,15 +13,24 @@ const MarkSplit = sequelize.define('MarkSplit', {
     },
     finalMark: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            max: 60
+        }
     },
     midtermMark: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            max: 25
+        }
     },
     practicalMark: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            max: 25
+        }
     },
     assignmentMark: {
         type: DataTypes.FLOAT,

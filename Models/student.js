@@ -17,15 +17,16 @@ const Student = sequelize.define('Student', {
     },
     hoursAchieved: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
     gpa: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: true
     },
     academicYear: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 1
     },
     enrollmentDate: {
         type: DataTypes.DATE,
@@ -33,7 +34,7 @@ const Student = sequelize.define('Student', {
     },
     major: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     balance: {
         type: DataTypes.FLOAT,
