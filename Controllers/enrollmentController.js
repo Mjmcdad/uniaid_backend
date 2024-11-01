@@ -55,6 +55,27 @@ const getEnrollmentBySubjectOfferId = async (req, res) => {
     }
 };
 
+const getEnrollmentBySemester = async (req, res) => {
+    const {semesterId} = req.params;
+    try {
+        const enrollment = await Enrollment.findAll({
+            include: [
+                {model: SubjectOffer,
+                     where: {semesterId},
+                     attributes: [],
+                     include: [
+                        {model: Semester,
+                             attributes: ['id','name']}
+                     ]
+                    }
+            ]
+        });
+        res.status(200).json(enrollment);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
 
-module.exports = {createEnrollment, updateEnrollment, deleteEnrollment, getEnrollmentByStudentId, getEnrollmentBySubjectOfferId};
+
+module.exports = {createEnrollment, updateEnrollment, deleteEnrollment, getEnrollmentByStudentId, getEnrollmentBySubjectOfferId, getEnrollmentBySemester};

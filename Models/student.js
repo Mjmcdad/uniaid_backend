@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
+const PriceForEnrollment = require('./priceForEnrollment');
 const sequelize = require('../dataBase');
+
 
 const Student = sequelize.define('Student', {
     id: {
@@ -10,6 +12,14 @@ const Student = sequelize.define('Student', {
      userId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
+    },
+    priceForEnrollmentId: {
+        type: DataTypes.FLOAT,
+        foreignKey: true,
+        references: {
+            model: PriceForEnrollment,
+            key: 'id'
+        }
     },
     socialNumber: {
         type: DataTypes.STRING,

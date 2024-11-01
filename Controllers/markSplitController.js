@@ -5,7 +5,8 @@ const Assignments = require('../Models/assginments');
 const createMarkSplit = async (req, res) => {
     const {subjectOfferId, finalMark, midtermMark, practicalMark, assignmentMark} = req.body;
     try {
-        const markSplit = await MarkSplit.create({subjectOfferId, finalMark, midtermMark, practicalMark, assignmentMark});
+        const markSplit = await MarkSplit.create({subjectOfferId, finalMark, midtermMark, practicalMark});
+        await Assignments.create({markSplitId: markSplit.id});
         res.status(201).json(markSplit);
     } catch (error) {
         res.status(500).json({message: error.message});

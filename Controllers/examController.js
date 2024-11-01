@@ -32,4 +32,23 @@ const deleteExam = async (req, res) => {
     }
 };
 
-module.exports = {createExam, updateExam, deleteExam};
+const getExamBySubjectOffer = async (req, res) => {
+    const {subjectOfferId} = req.params;
+    try {
+        const exam = await Exam.findAll({where: {subjectOfferId}});
+        res.status(200).json(exam);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+const getExamBySemester = async (req, res) => {
+    const {semesterId} = req.params;
+    try {
+        const exams = await Exam.findAll({where: {semesterId}});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+module.exports = {createExam, updateExam, deleteExam, getExamBySubjectOffer, getExamBySemester};

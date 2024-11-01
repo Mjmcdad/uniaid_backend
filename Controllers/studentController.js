@@ -1,11 +1,12 @@
 const User = require('../Models/user');
 const Student = require('../Models/student');
+const EnrollmentPrice = require('../Models/enrollmentPrice');
 
 
 const createStudent = async (req, res) => {
-    const {firstName, lastName, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
+    const {firstName, lastName, priceForEnrollmentId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
     try {
-        const student = await Student.create({firstName, lastName, email, password, phoneNumber, academicYear, enrollmentDate, major, balance});
+        const student = await Student.create({firstName, lastName, priceForEnrollmentId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance});
         res.status(201).json(student);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -14,9 +15,9 @@ const createStudent = async (req, res) => {
 
 const updateStudent = async (req, res) => {
     const {id} = req.params;
-    const {firstName, lastName, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
+    const {firstName, lastName, priceForEnrollmentId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
     try {
-        const student = await Student.update({firstName, lastName, email, password, phoneNumber, academicYear, enrollmentDate, major, balance}, {where: {id}});
+        const student = await Student.update({firstName, lastName, priceForEnrollmentId,    email, password, phoneNumber, academicYear, enrollmentDate, major, balance}, {where: {id}});
         res.status(200).json(student);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -52,3 +53,14 @@ const getStudentById = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+const getAllStudents = async (req, res) => {
+    try {
+        const students = await Student.findAll();
+        res.status(200).json(students);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+module.exports = {createStudent, updateStudent, deleteStudent, getStudentByName, getStudentById, getAllStudents};

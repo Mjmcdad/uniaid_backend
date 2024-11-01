@@ -31,6 +31,16 @@ const deleteSemester = async (req, res) => {
     }
 };
 
+const getSemester = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const semester = await Semester.findByPk(id);
+        res.status(200).json(semester);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
 
-module.exports = {createSemester, updateSemester, deleteSemester};
+
+module.exports = {createSemester, updateSemester, deleteSemester, getSemester};

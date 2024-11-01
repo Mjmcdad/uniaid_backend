@@ -33,4 +33,14 @@ const deleteSubjectOffer = async (req, res) => {
     }
 };
 
-module.exports = {createSubjectOffer, updateSubjectOffer, deleteSubjectOffer};
+const getSubjectOfferBySemester = async (req, res) => {
+    const {semesterId} = req.params;
+    try {
+        const subjectOffers = await SubjectOffer.findAll({where: {semesterId}});
+        res.status(200).json(subjectOffers);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+module.exports = {createSubjectOffer, updateSubjectOffer, deleteSubjectOffer, getSubjectOfferBySemester};

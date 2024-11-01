@@ -7,6 +7,12 @@ const createSubject = async (req, res) => {
     const {name, hours, academicYear, hasPractical} = req.body;
     try {
         const subject = await Subject.create({name, hours, academicYear, hasPractical});
+
+        await Tsection.create({subjectId: subject.id, teacherId: req.user.id, t_hours: hours, time: req.body.time});
+
+        if (hasPractical) {
+            await Psection.create({subjectId: subject.id, teacherId: req.user.id, p_hours: hours, time: req.body.time});
+        }
         res.status(201).json(subject);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -43,25 +49,25 @@ const deleteSubjectByName = async (req, res) => {
 };
 
 
-const createTsection = async (req, res) => {
-    const {subjectId, teacherId, t_hours, time} = req.body;
-    try {
-        const tSection = await Tsection.create({subjectId, teacherId, t_hours, time});
-        res.status(201).json(tSection);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+// const createTsection = async (req, res) => {
+//     const {subjectId, teacherId, t_hours, time} = req.body;
+//     try {
+//         const tSection = await Tsection.create({subjectId, teacherId, t_hours, time});
+//         res.status(201).json(tSection);
+//     } catch (error) {
+//         res.status(500).json({message: error.message});
+//     }
+// };
 
-const createPsection = async (req, res) => {
-    const {subjectId, teacherId, p_hours, time} = req.body;
-    try {
-        const pSection = await Psection.create({subjectId, teacherId, p_hours, time});
-        res.status(201).json(pSection);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}; 
+// const createPsection = async (req, res) => {
+//     const {subjectId, teacherId, p_hours, time} = req.body;
+//     try {
+//         const pSection = await Psection.create({subjectId, teacherId, p_hours, time});
+//         res.status(201).json(pSection);
+//     } catch (error) {
+//         res.status(500).json({message: error.message});
+//     }
+// }; 
 
 const getSubjectsByTeacher = async (req, res) => {
     const {teacherId} = req.params;
