@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const assignmentsController = require('../Controllers/assignmentsController');
+const assignmentsController = require('../Controllers/assginmentsController');
 
 router.post('/createAssignment', assignmentsController.createAssignment);
 router.put('/updateAssignment/:id', assignmentsController.updateAssignment);

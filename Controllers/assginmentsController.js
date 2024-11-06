@@ -1,4 +1,4 @@
-const Assignment = require('../Models/assignment');
+const Assignment = require('../Models/assginments');
 const MarkSplit = require('../Models/markSplit');
 
 const createAssignment = async (req, res) => {

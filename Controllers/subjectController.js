@@ -49,25 +49,25 @@ const deleteSubjectByName = async (req, res) => {
 };
 
 
-// const createTsection = async (req, res) => {
-//     const {subjectId, teacherId, t_hours, time} = req.body;
-//     try {
-//         const tSection = await Tsection.create({subjectId, teacherId, t_hours, time});
-//         res.status(201).json(tSection);
-//     } catch (error) {
-//         res.status(500).json({message: error.message});
-//     }
-// };
+const createTsection = async (req, res) => {
+    const {subjectId, teacherId, t_hours, time} = req.body;
+    try {
+        const tSection = await Tsection.create({subjectId, teacherId, t_hours, time});
+        res.status(201).json(tSection);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
-// const createPsection = async (req, res) => {
-//     const {subjectId, teacherId, p_hours, time} = req.body;
-//     try {
-//         const pSection = await Psection.create({subjectId, teacherId, p_hours, time});
-//         res.status(201).json(pSection);
-//     } catch (error) {
-//         res.status(500).json({message: error.message});
-//     }
-// }; 
+const createPsection = async (req, res) => {
+    const {subjectId, teacherId, p_hours, time} = req.body;
+    try {
+        const pSection = await Psection.create({subjectId, teacherId, p_hours, time});
+        res.status(201).json(pSection);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}; 
 
 const getSubjectsByTeacher = async (req, res) => {
     const {teacherId} = req.params;
@@ -88,4 +88,4 @@ const getSubjectsByTeacher = async (req, res) => {
 
 
 
-module.exports = {createSubject, createTsection, createPsection, getSubjectsByTeacher, deleteSubjectById, deleteSubjectByName};
+module.exports = {createSubject, createTsection, createPsection, getSubjectsByTeacher, deleteSubjectById, deleteSubjectByName, getAllSubjects, };

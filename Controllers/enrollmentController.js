@@ -2,7 +2,7 @@ const Enrollment = require('../Models/enrollment');
 const Student = require('../Models/student');
 const Semester = require('../Models/semester');
 const Subject = require('../Models/subject');
-const SubjectOffer = require('../Models/subjectOffer');
+const SubjectOffer = require('../Models/subjectOffers');
 
 const createEnrollment = async (req, res) => {
     const {studentId, subjectOfferId, enrollmentDate, isQualified, status} = req.body;

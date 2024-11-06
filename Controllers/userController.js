@@ -26,6 +26,12 @@ const createUser = async (req, res) => {
     const {firstName, lastName, email, password, phoneNumber, role} = req.body;
     try {
         const user = await User.create({firstName, lastName, email, password, phoneNumber, role});
+        
+        
+        if (role === 'student') {
+            await Student.create({userId: User.id, firstName, lastName, email});
+        }
+        
         res.status(201).json(user);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -72,6 +78,9 @@ const login = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+
+
 
 module.exports = {getAllUsers, getUsersByRole, createUser, updateUser, deleteUser, createAdmin, login};
 

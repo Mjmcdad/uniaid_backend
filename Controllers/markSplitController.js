@@ -1,5 +1,5 @@
 const MarkSplit = require('../Models/markSplit');
-const SubjectOffer = require('../Models/subjectOffer');
+const SubjectOffer = require('../Models/subjectOffers');
 const Assignments = require('../Models/assginments');
 
 const createMarkSplit = async (req, res) => {

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const PriceForEnrollment = require('./priceForEnrollment');
-const sequelize = require('../dataBase');
+const EnrollmentPrice = require('./enrollmentPrice');
+const sequelize = require('../config/dataBase');
 
 
 const Student = sequelize.define('Student', {
@@ -13,17 +13,17 @@ const Student = sequelize.define('Student', {
         type: DataTypes.INTEGER,
         foreignKey: true,
     },
-    priceForEnrollmentId: {
-        type: DataTypes.FLOAT,
+    enrollmentPriceId: {
+        type: DataTypes.INTEGER,
         foreignKey: true,
         references: {
-            model: PriceForEnrollment,
+            model: EnrollmentPrice,
             key: 'id'
         }
     },
     socialNumber: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     hoursAchieved: {
         type: DataTypes.INTEGER,
@@ -40,7 +40,8 @@ const Student = sequelize.define('Student', {
     },
     enrollmentDate: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false,
+        defaultValue: DataTypes.NOW
     },
     major: {
         type: DataTypes.STRING,
@@ -48,7 +49,7 @@ const Student = sequelize.define('Student', {
     },
     balance: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: true
     }
 });
 

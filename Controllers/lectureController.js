@@ -1,5 +1,5 @@
 const Lecture = require('../Models/lecture');
-const SubjectOffer = require('../Models/subjectOffer');
+const SubjectOffer = require('../Models/subjectOffers');
 const Room = require('../Models/room');
 
 const createLecture = async (req, res) => {

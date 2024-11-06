@@ -1,5 +1,5 @@
 const Exam = require('../Models/exam');
-const SubjectOffer = require('../Models/subjectOffer');
+const SubjectOffer = require('../Models/subjectOffers');
 
 const createExam = async (req, res) => {
     const {subjectOfferId, type, date, duration} = req.body;

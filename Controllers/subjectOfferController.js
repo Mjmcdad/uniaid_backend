@@ -1,4 +1,4 @@
-const SubjectOffer = require('../Models/subjectOffer');
+const SubjectOffer = require('../Models/subjectOffers');
 const Semester = require('../Models/semester');
 const Subject = require('../Models/subject');
 

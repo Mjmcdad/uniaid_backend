@@ -82,3 +82,5 @@ const createPteacher = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+module.exports = {createTeacher, updateTeacher, deleteTeacher, getTeacherByName, getTeacherById, getAllTeachers, createTteacher, createPteacher};

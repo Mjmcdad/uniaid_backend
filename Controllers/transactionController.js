@@ -1,6 +1,6 @@
-const Transaction = require("../Models/transactionModel");
-const Student = require("../Models/studentModel");
-const Subject = require("../Models/subjectModel");
+const Transaction = require("../Models/transactions");
+const Student = require("../Models/student");
+const Subject = require("../Models/subject");
 
 const createTransaction = async (req, res) => {
     const { studentId, subjectId, amount } = req.body;
@@ -73,6 +73,8 @@ const updateTransaction = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+
 
 
 
