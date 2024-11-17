@@ -17,8 +17,17 @@ const updateStudent = async (req, res) => {
     const {id} = req.params;
     const {firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
     try {
-        const student = await Student.update({firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance}, {where: {id}});
-        res.status(200).json(student);
+        const [updated] = await Student.update(
+            {firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance},
+            {where: {id}}
+        );
+
+        if (updated) {
+            const updatedStudent = await Student.findByPk(id);
+            res.status(200).json(updatedStudent);
+        } else {
+            res.status(404).json({message: "Student not found"});
+        }
     } catch (error) {
         res.status(500).json({message: error.message});
     }
