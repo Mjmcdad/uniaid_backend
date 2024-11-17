@@ -4,9 +4,9 @@ const Psection = require('../Models/pSection');
 const Teacher = require('../Models/teacher');
 
 const createSubject = async (req, res) => {
-    const {name, hours, academicYear, hasPractical} = req.body;
+    const {name, description, hours, academicYear, hasPractical} = req.body;
     try {
-        const subject = await Subject.create({name, hours, academicYear, hasPractical});
+        const subject = await Subject.create({name, description, hours, academicYear, hasPractical});
 
         await Tsection.create({subjectId: subject.id, teacherId: req.user.id, t_hours: hours, time: req.body.time});
 
