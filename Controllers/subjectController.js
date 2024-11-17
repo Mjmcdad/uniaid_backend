@@ -86,6 +86,16 @@ const getSubjectsByTeacher = async (req, res) => {
     }
 };
 
+const getSubjectDescriptionByName = async (req, res) => {
+        const {name} = req.params;
+        try {
+            const subject = await Subject.findOne({where: {name}});
+            res.status(200).json(subject);
+        } catch (error) {
+            res.status(500).json({message: error.message});
+    }
+};
 
 
-module.exports = {createSubject, createTsection, createPsection, getSubjectsByTeacher, deleteSubjectById, deleteSubjectByName, getAllSubjects, };
+
+module.exports = {createSubject, createTsection, createPsection, getSubjectsByTeacher, deleteSubjectById, deleteSubjectByName, getAllSubjects, getSubjectDescriptionByName};
