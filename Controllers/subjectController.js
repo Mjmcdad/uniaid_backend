@@ -2,16 +2,17 @@ const Subject = require('../Models/subject');
 const Tsection = require('../Models/tSection');
 const Psection = require('../Models/pSection');
 const Teacher = require('../Models/teacher');
+const User = require('../Models/user');
 
 const createSubject = async (req, res) => {
-    const {name, description, hours, academicYear, hasPractical} = req.body;
+    const {name, description, prerequisites, requiredFor, subjectType, hours, academicYear, hasPractical} = req.body;
     try {
-        const subject = await Subject.create({name, description, hours, academicYear, hasPractical});
+        const subject = await Subject.create({name, description, prerequisites, requiredFor, subjectType, hours, academicYear, hasPractical});
 
-        await Tsection.create({subjectId: subject.id, teacherId: req.user.id, t_hours: hours, time: req.body.time});
+        await Tsection.create({subjectId: subject.id, t_hours: hours});
 
-        if (hasPractical) {
-            await Psection.create({subjectId: subject.id, teacherId: req.user.id, p_hours: hours, time: req.body.time});
+        if (hasPractical === true) {
+            await Psection.create({subjectId: subject.id, p_hours: hours});
         }
         res.status(201).json(subject);
     } catch (error) {

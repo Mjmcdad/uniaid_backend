@@ -12,8 +12,20 @@ const Subject = sequelize.define('Subject', {
         allowNull: false
     },
     description: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
+    },
+    prerequisites: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    requiredFor: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    subjectType: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     hours: {
         type: DataTypes.INTEGER,

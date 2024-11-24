@@ -13,11 +13,11 @@ const PSection = sequelize.define('PSection', {
     },
     p_hours: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
     },
     time: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: true
     }
 }); 
 
