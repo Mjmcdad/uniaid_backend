@@ -11,6 +11,10 @@ const Room = sequelize.define('Room', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    floor: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     capacity: {
         type: DataTypes.INTEGER,
         allowNull: false

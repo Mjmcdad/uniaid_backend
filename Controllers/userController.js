@@ -29,7 +29,7 @@ const createUser = async (req, res) => {
         
         
         if (role === 'student') {
-            await Student.create({userId: User.id, firstName, lastName, email});
+            await Student.create({userId: User.id, firstName, lastName, email,});
         }
         
         res.status(201).json(user);
