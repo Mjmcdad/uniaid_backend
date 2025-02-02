@@ -55,6 +55,14 @@ const getTheoricRooms = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+const getRoomById = async (req, res) => {
+    const {id} = req.params;
+    try {
+        const room = await Room.findByPk(id);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
 
-module.exports = {createRoom, updateRoom, deleteRoom, getRoombyNumber, getPracticalRooms, getTheoricRooms};
+module.exports = {createRoom, updateRoom, deleteRoom, getRoombyNumber, getPracticalRooms, getTheoricRooms, getRoomById};
