@@ -6,11 +6,32 @@ const EnrollmentPrice = require('../Models/enrollmentPrice');
 const createStudent = async (req, res) => {
     const {firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
     try {
-        const student = await Student.create({firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance});
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await User.create({
+            email,
+            password: hashedPassword,
+            role: 'student'
+        });
+
+        const student = await Student.create({
+            firstName,
+            lastName,
+            enrollmentPriceId,
+            email,
+            phoneNumber,
+            academicYear,
+            enrollmentDate,
+            major,
+            balance,
+            userId: user.id
+        });
+
         res.status(201).json(student);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
+
 };
 
 const updateStudent = async (req, res) => {
@@ -54,12 +75,28 @@ const getStudentByName = async (req, res) => {
 };
 
 const getStudentById = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     try {
-        const student = await Student.findByPk(id);
-        res.status(200).json(student);
+        const student = await Student.findByPk(id, {
+            include: [{
+                model: User,
+                attributes: ['firstName', 'lastName'] 
+            }]
+        });
+
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
+        const studentData = {
+            ...student.toJSON(),
+            firstName: student.User.firstName,
+            lastName: student.User.lastName
+        };
+
+        res.status(200).json(studentData);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
