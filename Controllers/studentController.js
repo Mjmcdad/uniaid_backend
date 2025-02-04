@@ -46,6 +46,7 @@ const updateStudent = async (req, res) => {
     const {id} = req.params;
     const {firstName, lastName, enrollmentPriceId, socialNumber, hoursAchieved, gpa, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
     try {
+
         const [updated] = await Student.update(
 
             {firstName, lastName, enrollmentPriceId, socialNumber, hoursAchieved, gpa, email, password, phoneNumber, academicYear, enrollmentDate, major, balance},
