@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 
 const createStudent = async (req, res) => {
-    const {firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
+    const {firstName, lastName, enrollmentPriceId, socialNumber, hoursAchieved, gpa, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -22,12 +22,16 @@ const createStudent = async (req, res) => {
             firstName,
             lastName,
             enrollmentPriceId,
+            socialNumber,
+            hoursAchieved,
+            gpa,
             email,
             phoneNumber,
             academicYear,
             enrollmentDate,
             major,
             balance,
+
             userId: user.id
         });
 
@@ -40,10 +44,11 @@ const createStudent = async (req, res) => {
 
 const updateStudent = async (req, res) => {
     const {id} = req.params;
-    const {firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
+    const {firstName, lastName, enrollmentPriceId, socialNumber, hoursAchieved, gpa, email, password, phoneNumber, academicYear, enrollmentDate, major, balance} = req.body;
     try {
         const [updated] = await Student.update(
-            {firstName, lastName, enrollmentPriceId, email, password, phoneNumber, academicYear, enrollmentDate, major, balance},
+
+            {firstName, lastName, enrollmentPriceId, socialNumber, hoursAchieved, gpa, email, password, phoneNumber, academicYear, enrollmentDate, major, balance},
             {where: {id}}
         );
 
