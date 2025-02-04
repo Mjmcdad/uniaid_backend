@@ -10,8 +10,11 @@ const createStudent = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
+            firstName,
+            lastName,
             email,
             password: hashedPassword,
+            phoneNumber,
             role: 'student'
         });
 
