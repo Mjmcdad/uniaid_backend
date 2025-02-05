@@ -90,7 +90,7 @@ const getStudentById = async (req, res) => {
         const student = await Student.findByPk(id, {
             include: [{
                 model: User,
-                attributes: ['firstName', 'lastName'] 
+                attributes: ['firstName', 'lastName', 'email', 'phoneNumber']
             }]
         });
 
@@ -101,7 +101,9 @@ const getStudentById = async (req, res) => {
         const studentData = {
             ...student.toJSON(),
             firstName: student.User.firstName,
-            lastName: student.User.lastName
+            lastName: student.User.lastName,
+            email: student.User.email,
+            phoneNumber: student.User.phoneNumber
         };
 
         res.status(200).json(studentData);
