@@ -73,11 +73,41 @@ const createAdmin = async (req, res) => {
 };
 
 const login = async (req, res) => {
+    const { id, password } = req.body;
+    try {
+        const student = await Student.findByPk(id, {
+            include: [{
+                model: User,
+                attributes: ['password', 'role']
+            }]
+        });
+
+        if (!student || !student.User) {
+            console.log('Student not found');
+            return res.status(401).json({ message: 'Invalid ID or password' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, student.User.password);
+        if (!isPasswordValid) {
+            console.log('Invalid password');
+            return res.status(401).json({ message: 'Invalid ID or password' });
+        }
+
+        const token = jwt.sign({ id: student.id, role: student.User.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(200).json({ token });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Login function for admins using email
+const adminLogin = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email, role: 'admin' } });
         if (!user) {
-            console.log('User not found');
+            console.log('Admin not found');
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
@@ -95,7 +125,7 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = {getAllUsers, getUsersByRole, createUser, updateUser, deleteUser, createAdmin, login};
+module.exports = {getAllUsers, getUsersByRole, createUser, updateUser, deleteUser, createAdmin, login, adminLogin};
 
 
 

@@ -4,6 +4,8 @@ const userController = require('../Controllers/userController');
 
 router.post('/createUser', userController.createUser);
 router.post('/login', userController.login);
+router.post('/login/student', userController.login);
+router.post('/login/admin', userController.adminLogin);
 router.post('/createAdmin', userController.createAdmin);
 router.get('/getAllUsers', userController.getAllUsers);
 router.get('/getUsersByRole/:role', userController.getUsersByRole);
