@@ -25,6 +25,6 @@ const Enrollment = sequelize.define('Enrollment', {
     }
 });
 
-t
+
 
 module.exports = Enrollment;
