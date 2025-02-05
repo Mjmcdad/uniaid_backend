@@ -38,8 +38,27 @@ const deleteEnrollment = async (req, res) => {
 const getEnrollmentByStudentId = async (req, res) => {
     const {studentId} = req.params;
     try {
-        const enrollment = await Enrollment.findAll({where: {studentId}});
-        res.status(200).json(enrollment);
+        const enrollments = await Enrollment.findAll({
+            where: {studentId},
+            include: [{
+                model: SubjectOffer,
+                include: [{
+                    model: Subject,
+                    attributes: ['name']
+                }]
+            }]
+        });
+
+        if (!enrollments.length) {
+            return res.status(404).json({message: 'No enrollments found for this student'});
+        }
+
+        const enrollmentData = enrollments.map(enrollment => ({
+            ...enrollment.toJSON(),
+            subjectName: enrollment.SubjectOffer.Subject.name
+        }));
+
+        res.status(200).json(enrollmentData);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

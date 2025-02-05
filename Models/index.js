@@ -70,7 +70,14 @@ const initModels = async() => {
 
     SubjectOffer.belongsToMany(Room, { through: Lecture, foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
     Room.belongsToMany(SubjectOffer, { through: Lecture, foreignKey: 'roomId', onDelete: 'CASCADE' });
+
+    SubjectOffer.belongsTo(Subject, { foreignKey: 'subjectId' });
     };
+
+    SubjectOffer.hasMany(Enrollment, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
+    Enrollment.belongsTo(SubjectOffer, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
+
+    
 
 module.exports = { sequelize, initModels };
 
