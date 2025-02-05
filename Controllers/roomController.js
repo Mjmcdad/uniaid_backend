@@ -56,11 +56,19 @@ const getTheoricRooms = async (req, res) => {
     }
 };
 const getRoomById = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
+    console.log(`Fetching room with ID: ${id}`);
     try {
         const room = await Room.findByPk(id);
+        if (!room) {
+            console.log('Room not found');
+            return res.status(404).json({ message: 'Room not found' });
+        }
+        console.log('Room found:', room);
+        res.status(200).json(room);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        console.error('Error fetching room:', error);
+        res.status(500).json({ message: error.message });
     }
 };
 
