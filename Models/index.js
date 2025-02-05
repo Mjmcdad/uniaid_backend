@@ -77,6 +77,9 @@ const initModels = async() => {
     SubjectOffer.hasMany(Enrollment, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
     Enrollment.belongsTo(SubjectOffer, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
 
+    SubjectOffer.belongsTo(Subject, { foreignKey: 'subjectId' });
+    Subject.hasMany(SubjectOffer, { foreignKey: 'subjectId', onDelete: 'CASCADE' });
+
     
 
 module.exports = { sequelize, initModels };

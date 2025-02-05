@@ -3,6 +3,7 @@ const Student = require('../Models/student');
 const Semester = require('../Models/semester');
 const Subject = require('../Models/subject');
 const SubjectOffer = require('../Models/subjectOffers');
+const { Op } = require('sequelize');
 
 const createEnrollment = async (req, res) => {
     const {studentId, subjectOfferId, enrollmentDate, isQualified, status} = req.body;
@@ -95,6 +96,43 @@ const getEnrollmentBySemester = async (req, res) => {
     }
 };
 
+const getUnenrolledSubjects = async (req, res) => {
+    const { studentId } = req.params;
+    try {
+        
+        const enrolledSubjects = await Enrollment.findAll({
+            where: { studentId },
+            include: [{
+                model: SubjectOffer,
+                include: [{
+                    model: Subject,
+                    attributes: ['id', 'name']
+                }]
+            }]
+        });
+
+        
+        const enrolledSubjectIds = enrolledSubjects.map(enrollment => enrollment.SubjectOffer.Subject.id);
+
+        
+        const unenrolledSubjects = await Subject.findAll({
+            where: {
+                id: { [Op.notIn]: enrolledSubjectIds } 
+            },
+            attributes: ['id', 'name']
+        });
+
+        
+        if (!unenrolledSubjects.length) {
+            return res.status(404).json({ message: 'Student is enrolled in all available subjects' });
+        }
+
+        
+        res.status(200).json(unenrolledSubjects);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 
-module.exports = {createEnrollment, updateEnrollment, deleteEnrollment, getEnrollmentByStudentId, getEnrollmentBySubjectOfferId, getEnrollmentBySemester};
+module.exports = {createEnrollment, updateEnrollment, deleteEnrollment, getEnrollmentByStudentId, getEnrollmentBySubjectOfferId, getEnrollmentBySemester, getUnenrolledSubjects};

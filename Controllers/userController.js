@@ -101,7 +101,7 @@ const login = async (req, res) => {
     }
 };
 
-// Login function for admins using email
+
 const adminLogin = async (req, res) => {
     const { email, password } = req.body;
     try {

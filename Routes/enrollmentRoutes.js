@@ -8,5 +8,6 @@ router.delete('/deleteEnrollment/:id', enrollmentController.deleteEnrollment);
 router.get('/getEnrollmentByStudentId/:studentId', enrollmentController.getEnrollmentByStudentId);
 router.get('/getEnrollmentBySubjectOfferId/:subjectOfferId', enrollmentController.getEnrollmentBySubjectOfferId);
 router.get('/getEnrollmentBySemester/:semesterId', enrollmentController.getEnrollmentBySemester);
+router.get('/getUnenrolledSubjects/:studentId', enrollmentController.getUnenrolledSubjects);
 
 module.exports = router;
