@@ -56,8 +56,6 @@ const initModels = async() => {
     StudentMark.hasOne(Enrollment, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
     Enrollment.belongsTo(StudentMark, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
 
-    Student.hasOne(EnrollmentPrice, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
-    EnrollmentPrice.belongsTo(Student, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
 
     SubjectOffer.hasMany(Exam, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
     Exam.belongsTo(SubjectOffer, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });

@@ -19,7 +19,7 @@ const examRoutes = require('./Routes/examRoutes');
 const enrollmentRoutes = require('./Routes/enrollmentRoutes');
 const enrollmentPriceRoutes = require('./Routes/enrollmentPriceRoutes');
 const assignmentRoutes = require('./Routes/assignmentRoutes');
-
+const adminRoutes = require('./Routes/adminRoutes')
 initModels();
 
 app.listen(port, () => {
@@ -43,6 +43,7 @@ app.use('/exams', examRoutes);
 app.use('/enrollments', enrollmentRoutes);
 app.use('/enrollmentPrices', enrollmentPriceRoutes);
 app.use('/assignments', assignmentRoutes);
+app.use('/admin',adminRoutes)
 
 
 
