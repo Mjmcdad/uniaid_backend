@@ -1,12 +1,13 @@
 const User = require("../Models/user");
 const Admin = require("../Models/admin");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt-nodejs");
+
 
 const createAdmin = async (req, res) => {
   const { firstName, lastName, email, password, phoneNumber } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password);
     const user = await User.create({
       firstName,
       lastName,
@@ -58,4 +59,5 @@ const adminLogin = async (req, res) => {
 module.exports = {
   createAdmin,
   adminLogin,
+
 };

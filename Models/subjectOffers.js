@@ -6,11 +6,12 @@ const SubjectOffer = sequelize.define('SubjectOffer', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
-    }, 
+    },
     subjectId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
-    }, semesterId: {
+    },
+    semesterId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
     },

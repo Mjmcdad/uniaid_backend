@@ -2,7 +2,7 @@ const User = require("../Models/user");
 const Student = require("../Models/student");
 const Teacher = require("../Models/teacher");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt-nodejs");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -26,7 +26,7 @@ const getUsersByRole = async (req, res) => {
 const createUser = async (req, res) => {
   const { firstName, lastName, email, password, phoneNumber, role } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password);
     const user = await User.create({
       firstName,
       lastName,

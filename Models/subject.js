@@ -32,7 +32,7 @@ const Subject = sequelize.define('Subject', {
         allowNull: false
     },  
     academicYear: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     hasPractical: {

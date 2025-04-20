@@ -3,12 +3,12 @@ const Tsection = require("../Models/tSection");
 const Psection = require("../Models/pSection");
 const Tteacher = require("../Models/tTeacher");
 const Pteacher = require("../Models/pTeacher");
-const Subject = require("../Models/subject");
+const User = require("../Models/user")
 
 const createTeacher = async (req, res) => {
   const { firstName, lastName, email, password, phoneNumber } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password);
     const user = await User.create({
       firstName,
       lastName,

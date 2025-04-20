@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const studentController = require('../Controllers/studentController');
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+
 
 router.post('/createStudent', studentController.createStudent);
 router.put('/updateStudent/:id', studentController.updateStudent);

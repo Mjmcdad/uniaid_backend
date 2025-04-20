@@ -18,7 +18,6 @@ const TSection = require('./tSection');
 const PSection = require('./pSection');
 const TTeacher = require('./tTeacher');
 const PTeacher = require('./pTeacher');
-const EnrollmentPrice = require('./enrollmentPrice');
 const Room = require('./room');
 
 const initModels = async() => { 
