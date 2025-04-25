@@ -3,12 +3,14 @@ const router = express.Router();
 const studentController = require('../Controllers/studentController');
 
 
-router.post('/createStudent', studentController.createStudent);
+router.post('/', studentController.createStudent);
+router.post('/login', studentController.login);
+router.post('/enrollment', studentController.createEnrollment);
 router.put('/updateStudent/:id', studentController.updateStudent);
 router.delete('/deleteStudent/:id', studentController.deleteStudent);
 router.get('/getStudentByName/:firstName/:lastName', studentController.getStudentByName);
 router.get('/getStudentById/:id', studentController.getStudentById);
 router.get('/getAllStudents', studentController.getAllStudents);
-router.post('/login', studentController.login);
+
 
 module.exports = router;

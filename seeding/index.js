@@ -21,7 +21,7 @@ const teacherPath = path.join(__dirname, "../../أساتذة.csv");
 async function seed() {
     try {
 
-        const hashedPassword = await bcrypt.hashSync("123456789");
+        const hashedPassword = bcrypt.hashSync("123456789");
         const user = await User.create({
             firstName: "admin",
             lastName: "admin",

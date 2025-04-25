@@ -5,42 +5,34 @@ const Subject = require('../Models/subject');
 const SubjectOffer = require('../Models/subjectOffers');
 const { Op } = require('sequelize');
 
-const createEnrollment = async (req, res) => {
-    const {studentId, subjectOfferId, enrollmentDate, isQualified, status} = req.body;
-    try {
-        const enrollment = await Enrollment.create({studentId, subjectOfferId, enrollmentDate, isQualified, status});
-        res.status(201).json(enrollment);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+
 
 const updateEnrollment = async (req, res) => {
-    const {id} = req.params;
-    const {studentId, subjectOfferId, enrollmentDate, isQualified, status} = req.body;
+    const { id } = req.params;
+    const { studentId, subjectOfferId, enrollmentDate, isQualified, status } = req.body;
     try {
-        const enrollment = await Enrollment.update({studentId, subjectOfferId, enrollmentDate, isQualified, status}, {where: {id}});
+        const enrollment = await Enrollment.update({ studentId, subjectOfferId, enrollmentDate, isQualified, status }, { where: { id } });
         res.status(200).json(enrollment);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
 const deleteEnrollment = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     try {
-        const enrollment = await Enrollment.destroy({where: {id}});
+        const enrollment = await Enrollment.destroy({ where: { id } });
         res.status(200).json(enrollment);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
 const getEnrollmentByStudentId = async (req, res) => {
-    const {studentId} = req.params;
+    const { studentId } = req.params;
     try {
         const enrollments = await Enrollment.findAll({
-            where: {studentId},
+            where: { studentId },
             include: [{
                 model: SubjectOffer,
                 include: [{
@@ -51,7 +43,7 @@ const getEnrollmentByStudentId = async (req, res) => {
         });
 
         if (!enrollments.length) {
-            return res.status(404).json({message: 'No enrollments found for this student'});
+            return res.status(404).json({ message: 'No enrollments found for this student' });
         }
 
         const enrollmentData = enrollments.map(enrollment => ({
@@ -61,45 +53,48 @@ const getEnrollmentByStudentId = async (req, res) => {
 
         res.status(200).json(enrollmentData);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
 const getEnrollmentBySubjectOfferId = async (req, res) => {
-    const {subjectOfferId} = req.params;
+    const { subjectOfferId } = req.params;
     try {
-        const enrollment = await Enrollment.findAll({where: {subjectOfferId}});
+        const enrollment = await Enrollment.findAll({ where: { subjectOfferId } });
         res.status(200).json(enrollment);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
 const getEnrollmentBySemester = async (req, res) => {
-    const {semesterId} = req.params;
+    const { semesterId } = req.params;
     try {
         const enrollment = await Enrollment.findAll({
             include: [
-                {model: SubjectOffer,
-                     where: {semesterId},
-                     attributes: [],
-                     include: [
-                        {model: Semester,
-                             attributes: ['id','name']}
-                     ]
-                    }
+                {
+                    model: SubjectOffer,
+                    where: { semesterId },
+                    attributes: [],
+                    include: [
+                        {
+                            model: Semester,
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                }
             ]
         });
         res.status(200).json(enrollment);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
 const getUnenrolledSubjects = async (req, res) => {
     const { studentId } = req.params;
     try {
-        
+
         const enrolledSubjects = await Enrollment.findAll({
             where: { studentId },
             include: [{
@@ -111,23 +106,23 @@ const getUnenrolledSubjects = async (req, res) => {
             }]
         });
 
-        
+
         const enrolledSubjectIds = enrolledSubjects.map(enrollment => enrollment.SubjectOffer.Subject.id);
 
-        
+
         const unenrolledSubjects = await Subject.findAll({
             where: {
-                id: { [Op.notIn]: enrolledSubjectIds } 
+                id: { [Op.notIn]: enrolledSubjectIds }
             },
             attributes: ['id', 'name']
         });
 
-        
+
         if (!unenrolledSubjects.length) {
             return res.status(404).json({ message: 'Student is enrolled in all available subjects' });
         }
 
-        
+
         res.status(200).json(unenrolledSubjects);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -135,4 +130,4 @@ const getUnenrolledSubjects = async (req, res) => {
 };
 
 
-module.exports = {createEnrollment, updateEnrollment, deleteEnrollment, getEnrollmentByStudentId, getEnrollmentBySubjectOfferId, getEnrollmentBySemester, getUnenrolledSubjects};
+module.exports = { updateEnrollment, deleteEnrollment, getEnrollmentByStudentId, getEnrollmentBySubjectOfferId, getEnrollmentBySemester, getUnenrolledSubjects };

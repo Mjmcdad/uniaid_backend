@@ -10,6 +10,7 @@ const Enrollment = sequelize.define('Enrollment', {
     studentId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
+        allowNull: false
     },
     subjectOfferId: {
         type: DataTypes.INTEGER,
@@ -20,7 +21,7 @@ const Enrollment = sequelize.define('Enrollment', {
         allowNull: true
     },
     status: {
-        type: DataTypes.ENUM('Enrolled', 'Failed', 'Passed'),
+        type: DataTypes.ENUM('Enrolled', 'Failed', 'Passed','OnHold'),
         allowNull: false
     }
 });
