@@ -3,6 +3,7 @@ const Student = require("../Models/student");
 const EnrollmentPrice = require("../Models/enrollmentPrice");
 const Subject = require('../Models/subject')
 const SubjectOffer = require("../Models/subjectOffers")
+const Enrollment = require('../Models/enrollment')
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("jsonwebtoken");
 const db = require('../config/dataBase')
