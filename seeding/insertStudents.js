@@ -54,7 +54,7 @@ function getSocialNumber() {
 }
 
 function getMajor() {
-    const majors = ["علوم الحاسب", "هندسة البرمجيات", "الذكاء الصنعي", "الشبكات"];
+    const majors = ["هندسة البرمجيات", "الذكاء الصنعي", "الشبكات"];
     return majors[Math.floor(Math.random() * majors.length)];
 }
 

@@ -10,15 +10,16 @@ const PSection = sequelize.define('PSection', {
     subjectId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
+        unique: true
     },
     p_hours: {
         type: DataTypes.INTEGER,
         allowNull: true
     },
     time: {
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         allowNull: true
     }
-}); 
+});
 
 module.exports = PSection;

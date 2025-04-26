@@ -4,8 +4,9 @@ const subjectController = require('../Controllers/subjectController');
 
 router.post('/createSubject', subjectController.createSubject);
 router.delete('/deleteSubject/:id', subjectController.deleteSubjectById);
-router.get('/getAllSubjects', subjectController.getAllSubjects);
+router.get('/', subjectController.index);
+router.get('/:id', subjectController.get)
+router.post('/:id/p_section', subjectController.createPSection);
+router.post('/:id/t_section', subjectController.createTSection);
 router.delete('/deleteSubjectByName/:name', subjectController.deleteSubjectByName);
-router.get('/getSubjectsByTeacher/:teacherId', subjectController.getSubjectsByTeacher);
-router.get('/getSubjectDescriptionByName/:name', subjectController.getSubjectDescriptionByName);
 module.exports = router;

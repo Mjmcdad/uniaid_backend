@@ -21,36 +21,38 @@ async function insertRandomSectionsAndTeachers() {
             return;
         }
 
-        // Step 2: Insert random TSections and PSections for each subject
+        // Step 2: Insert one TSection and one PSection (if applicable) for each subject
         for (const subject of subjects) {
-            // Create a theoretical section for every subject
+            // Create one theoretical section for the subject
             const tSection = await TSection.create({
                 subjectId: subject.id,
                 t_hours: getRandomHours(),
-                time: getRandomTime()
+                time: getRandomTime(), // Random time in HH:mm:ss format
             });
 
-            // Assign a random teacher to the theoretical section
+            // Assign one random teacher to the theoretical section
             const randomTeacherForT = teachers[Math.floor(Math.random() * teachers.length)];
             await TTeacher.create({
                 teacherId: randomTeacherForT.id,
-                tSectionId: tSection.id
+                tSectionId: tSection.id,
             });
 
-            // If the subject has practical, create a practical section
+            // If the subject has practical sessions, create one practical section
             if (subject.hasPractical) {
                 const pSection = await PSection.create({
                     subjectId: subject.id,
                     p_hours: getRandomHours(),
-                    time: getRandomTime()
+                    time: getRandomTime(), // Random time in HH:mm:ss format
                 });
 
-                // Assign a random teacher to the practical section
+                // Assign one random teacher to the practical section
                 const randomTeacherForP = teachers[Math.floor(Math.random() * teachers.length)];
                 await PTeacher.create({
                     teacherId: randomTeacherForP.id,
-                    pSectionId: pSection.id
+                    pSectionId: pSection.id,
                 });
+            } else {
+                console.log(`Subject ${subject.name} does not have practical sessions. Skipping PSection creation.`);
             }
         }
 
@@ -61,16 +63,18 @@ async function insertRandomSectionsAndTeachers() {
 }
 
 module.exports = {
-    insertRandomSectionsAndTeachers
+    insertRandomSectionsAndTeachers,
 };
 
-
+// Helper Function: Generate Random Hours
 function getRandomHours() {
     return Math.floor(Math.random() * 3) + 1; // Random value between 1 and 3
 }
 
+// Helper Function: Generate Random Time (Only Time, No Date)
 function getRandomTime() {
-    const start = new Date();
-    const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000); // 1 week from now
-    return new Date(start.getTime() + Math.random() * (end - start));
+    const hours = String(Math.floor(Math.random() * 24)).padStart(2, '0'); // Random hour (0-23)
+    const minutes = String(Math.floor(Math.random() * 60)).padStart(2, '0'); // Random minute (0-59)
+    const seconds = String(Math.floor(Math.random() * 60)).padStart(2, '0'); // Random second (0-59)
+    return `${hours}:${minutes}:${seconds}`; // Format: HH:mm:ss
 }

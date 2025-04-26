@@ -1,4 +1,4 @@
-const sequelize = require('../config/dataBase'); 
+const sequelize = require('../config/dataBase');
 
 const User = require('./user');
 const Admin = require('./admin');
@@ -20,7 +20,7 @@ const TTeacher = require('./tTeacher');
 const PTeacher = require('./pTeacher');
 const Room = require('./room');
 
-const initModels = async() => { 
+const initModels = async () => {
     User.hasOne(Admin, { foreignKey: 'userId', onDelete: 'CASCADE' });
     Admin.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' });
 
@@ -30,10 +30,10 @@ const initModels = async() => {
     User.hasOne(Teacher, { foreignKey: 'userId', onDelete: 'CASCADE' });
     Teacher.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' });
 
-    Subject.hasOne(TSection , { foreignKey: 'subjectId', onDelete: 'CASCADE' });
+    Subject.hasOne(TSection, { foreignKey: 'subjectId', onDelete: 'CASCADE' });
     TSection.belongsTo(Subject, { foreignKey: 'subjectId', onDelete: 'CASCADE' });
 
-    Subject.hasOne(PSection , { foreignKey: 'subjectId', onDelete: 'CASCADE' });
+    Subject.hasOne(PSection, { foreignKey: 'subjectId', onDelete: 'CASCADE' });
     PSection.belongsTo(Subject, { foreignKey: 'subjectId', onDelete: 'CASCADE' });
 
     Teacher.belongsToMany(TSection, { through: TTeacher, foreignKey: 'teacherId', onDelete: 'CASCADE' });
@@ -42,15 +42,15 @@ const initModels = async() => {
     Teacher.belongsToMany(PSection, { through: PTeacher, foreignKey: 'teacherId', onDelete: 'CASCADE' });
     PSection.belongsToMany(Teacher, { through: PTeacher, foreignKey: 'pSectionId', onDelete: 'CASCADE' });
 
-    
+
     Semester.belongsToMany(Subject, { through: SubjectOffer, foreignKey: 'semesterId', onDelete: 'CASCADE' });
     Subject.belongsToMany(Semester, { through: SubjectOffer, foreignKey: 'subjectId', onDelete: 'CASCADE' });
 
     Student.belongsToMany(SubjectOffer, { through: Enrollment, foreignKey: 'studentId', onDelete: 'CASCADE' });
     SubjectOffer.belongsToMany(Student, { through: Enrollment, foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
 
-    Student.belongsToMany(Subject, {through: Transaction, foreignKey: 'studentId', onDelete: 'CASCADE'});
-    Subject.belongsToMany(Student, {through: Transaction, foreignKey: 'subjectId', onDelete: 'CASCADE'});
+    Student.belongsToMany(Subject, { through: Transaction, foreignKey: 'studentId', onDelete: 'CASCADE' });
+    Subject.belongsToMany(Student, { through: Transaction, foreignKey: 'subjectId', onDelete: 'CASCADE' });
 
     StudentMark.hasOne(Enrollment, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
     Enrollment.belongsTo(StudentMark, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
@@ -65,11 +65,15 @@ const initModels = async() => {
     MarkSplit.hasMany(Assignment, { foreignKey: 'markSplitId', onDelete: 'CASCADE' });
     Assignment.belongsTo(MarkSplit, { foreignKey: 'markSplitId', onDelete: 'CASCADE' });
 
-    SubjectOffer.belongsToMany(Room, { through: Lecture, foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
-    Room.belongsToMany(SubjectOffer, { through: Lecture, foreignKey: 'roomId', onDelete: 'CASCADE' });
+
+    Subject.hasMany(Lecture, { foreignKey: 'subjectId', onDelete: 'CASCADE' });
+    Lecture.belongsTo(Subject, { foreignKey: "subjectId", onDelete: 'CASCADE' })
+
+    Room.hasMany(Lecture, { foreignKey: 'roomId', onDelete: 'CASCADE' });
+    Lecture.belongsTo(Room, { foreignKey: "roomId", onDelete: 'CASCADE' })
 
     SubjectOffer.belongsTo(Subject, { foreignKey: 'subjectId' });
-    };
+
 
     SubjectOffer.hasMany(Enrollment, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
     Enrollment.belongsTo(SubjectOffer, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
@@ -77,7 +81,12 @@ const initModels = async() => {
     SubjectOffer.belongsTo(Subject, { foreignKey: 'subjectId' });
     Subject.hasMany(SubjectOffer, { foreignKey: 'subjectId', onDelete: 'CASCADE' });
 
-    
+
+    SubjectOffer.belongsTo(Semester, { foreignKey: 'semesterId' });
+    Semester.hasMany(SubjectOffer, { foreignKey: 'semesterId', onDelete: 'CASCADE' });
+};
+
+
 
 module.exports = { sequelize, initModels };
 

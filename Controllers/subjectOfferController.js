@@ -2,15 +2,7 @@ const SubjectOffer = require('../Models/subjectOffers');
 const Semester = require('../Models/semester');
 const Subject = require('../Models/subject');
 
-const createSubjectOffer = async (req, res) => {
-    const {subjectId, semesterId, isAvailable} = req.body;
-    try {
-        const subjectOffer = await SubjectOffer.create({subjectId, semesterId, isAvailable});
-        res.status(201).json(subjectOffer);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
+
 
 const updateSubjectOffer = async (req, res) => {
     const {id} = req.params;
@@ -43,4 +35,4 @@ const getSubjectOfferBySemester = async (req, res) => {
     }
 };
 
-module.exports = {createSubjectOffer, updateSubjectOffer, deleteSubjectOffer, getSubjectOfferBySemester};
+module.exports = { updateSubjectOffer, deleteSubjectOffer, getSubjectOfferBySemester};

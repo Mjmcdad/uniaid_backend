@@ -10,7 +10,7 @@ const { insertRandomSectionsAndTeachers } = require('./insertSections')
 const { insertRooms } = require("./inserRooms")
 const { inserStudents } = require("./insertStudents")
 const { insertEnrollmentsAndMarks } = require('./insertEnrollmentsAndMarks')
-
+const { insertLectures } = require('./insertLectures')
 
 const Admin = require("../Models/admin")
 const User = require("../Models/user")
@@ -52,7 +52,10 @@ async function seed() {
         await insertRooms();
 
         await inserStudents();
+
         await insertEnrollmentsAndMarks();
+
+        await insertLectures();
 
         console.log("Seeding completed successfully!");
     } catch (error) {

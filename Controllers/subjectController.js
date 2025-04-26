@@ -1,102 +1,209 @@
 const Subject = require('../Models/subject');
 const Tsection = require('../Models/tSection');
-const Psection = require('../Models/pSection');
-const Teacher = require('../Models/teacher');
-const User = require('../Models/user');
+const PSection = require('../Models/pSection');
+const tTeacher = require('../Models/tTeacher')
+const pTeacher = require('../Models/pTeacher')
+const User = require('../Models/user')
+const Teacher = require('../Models/teacher')
+const { Op } = require('sequelize');
+
 
 const createSubject = async (req, res) => {
-    const {name, description, prerequisites, requiredFor, subjectType, hours, academicYear, hasPractical} = req.body;
+    const { name, description, prerequisites, requiredFor, subjectType, hours, academicYear, hasPractical } = req.body;
     try {
-        const subject = await Subject.create({name, description, prerequisites, requiredFor, subjectType, hours, academicYear, hasPractical});
+        const subject = await Subject.create({ name, description, prerequisites, requiredFor, subjectType, hours, academicYear, hasPractical });
 
-        await Tsection.create({subjectId: subject.id, t_hours: hours});
+        await Tsection.create({ subjectId: subject.id, t_hours: hours });
 
         if (hasPractical === true) {
-            await Psection.create({subjectId: subject.id, p_hours: hours});
+            await Psection.create({ subjectId: subject.id, p_hours: hours });
         }
         res.status(201).json(subject);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
-const getAllSubjects = async (req, res) => {
+
+const index = async (req, res) => {
     try {
-        const subjects = await Subject.findAll();
+
+        const { name, academicYear, hasPractical, subjectType, hours, prerequisites, requiredFor } = req.query;
+
+        const queryOptions = {
+            where: {},
+
+            include: [
+                {
+                    model: PSection,
+                    include: [
+                        {
+                            model: Teacher,
+                            include: User,
+                        }
+                    ]
+                },
+                {
+                    model: Tsection,
+                    include: [
+                        {
+                            model: Teacher,
+                            include: User
+
+                        }
+                    ]
+                }
+            ]
+
+        };
+
+        if (name) {
+            queryOptions.where.name = { [Op.like]: `%${name}%` };
+        }
+
+        if (academicYear) {
+            queryOptions.where.academicYear = academicYear;
+        }
+
+        if (hasPractical !== undefined) {
+            queryOptions.where.hasPractical = hasPractical === 'true';
+        }
+
+        if (subjectType) {
+            queryOptions.where.subjectType = subjectType;
+        }
+
+        if (hours) {
+            queryOptions.where.hours = hours;
+        }
+
+        if (prerequisites) {
+            queryOptions.where.prerequisites = { [Op.like]: `%${prerequisites}%` };
+        }
+
+        if (requiredFor) {
+            queryOptions.where.requiredFor = { [Op.like]: `%${requiredFor}%` };
+        }
+
+        const subjects = await Subject.findAll(queryOptions,);
+
         res.status(200).json(subjects);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
-const deleteSubjectById = async (req, res) => {
-    const {id} = req.params;
+const get = async (req, res) => {
     try {
-        const subject = await Subject.destroy({where: {id}});
+        const { id } = req.params
+        const subjects = await Subject.findByPk(id, {
+            include: [
+                {
+                    model: PSection,
+
+                    include: [
+                        {
+                            model: Teacher,
+                            include: User
+                        }
+                    ]
+                },
+                {
+                    model: Tsection,
+                    include: [
+                        {
+                            model: Teacher,
+                            include: User
+
+                        }
+                    ]
+                }
+            ]
+        });
+        res.status(200).json(subjects);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const createPSection = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { time, p_hours, teacherId } = req.body
+
+        const subject = await Subject.findByPk(id)
+        if (!subject.hasPractical)
+            throw new Error("Subject Doesn`t have Practical Section")
+
+
+
+        const p_section = await PSection.create({
+            subjectId: id,
+            time,
+            p_hours
+        })
+
+
+        const p_teacher = await pTeacher.create({
+            teacherId,
+            pSectionId: p_section.id
+        })
+
+        if (!p_teacher)
+            throw new Error("there is issue with creating the t teacher")
+
+        res.status(200).json({ p_section, p_teacher });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const createTSection = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { time, t_hours, teacherId } = req.body
+        const t_section = await Tsection.create({
+            subjectId: id,
+            time,
+            t_hours
+        })
+
+        if (!t_section)
+            throw new Error("there is issue with creating the t section")
+
+        const t_teacher = await tTeacher.create({
+            teacherId: teacherId,
+            tSectionId: t_section.id
+        })
+
+        if (!t_teacher)
+            throw new Error("there is issue with creating the t teacher")
+        res.status(200).json({ t_section, t_teacher });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const deleteSubjectById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const subject = await Subject.destroy({ where: { id } });
         res.status(200).json(subject);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
 const deleteSubjectByName = async (req, res) => {
-    const {name} = req.params;
+    const { name } = req.params;
     try {
-        const subject = await Subject.destroy({where: {name}});
+        const subject = await Subject.destroy({ where: { name } });
         res.status(200).json(subject);
     } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-
-const createTsection = async (req, res) => {
-    const {subjectId, teacherId, t_hours, time} = req.body;
-    try {
-        const tSection = await Tsection.create({subjectId, teacherId, t_hours, time});
-        res.status(201).json(tSection);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-const createPsection = async (req, res) => {
-    const {subjectId, teacherId, p_hours, time} = req.body;
-    try {
-        const pSection = await Psection.create({subjectId, teacherId, p_hours, time});
-        res.status(201).json(pSection);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}; 
-
-const getSubjectsByTeacher = async (req, res) => {
-    const {teacherId} = req.params;
-    try {
-        const tSections = await Tsection.findAll({where: {teacherId}, include: {model: Subject}});
-        const pSections = await Psection.findAll({where: {teacherId}, include: {model: Subject}});
-        
-        const subjects = new set();
-        
-        tSections.forEach(tSection => subjects.add(tSection.subject));
-        pSections.forEach(pSection => subjects.add(pSection.subject));
-
-        res.status(200).json(Array.from(subjects));
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-const getSubjectDescriptionByName = async (req, res) => {
-        const {name} = req.params;
-        try {
-            const subject = await Subject.findOne({where: {name}});
-            res.status(200).json(subject);
-        } catch (error) {
-            res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 };
 
 
 
-module.exports = {createSubject, createTsection, createPsection, getSubjectsByTeacher, deleteSubjectById, deleteSubjectByName, getAllSubjects, getSubjectDescriptionByName};
+module.exports = { createSubject, deleteSubjectById, deleteSubjectByName, index, get, createPSection, createTSection };

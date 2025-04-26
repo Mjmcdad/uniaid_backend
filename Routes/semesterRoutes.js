@@ -2,9 +2,12 @@ const express = require('express');
 const router = express.Router();
 const semesterController = require('../Controllers/semseterController');
 
-router.post('/createSemester', semesterController.createSemester);
+router.post('/', semesterController.create);
+router.post('/:id/subject_offer', semesterController.createSubjectOffer);
+
 router.put('/updateSemester/:id', semesterController.updateSemester);
 router.delete('/deleteSemester/:id', semesterController.deleteSemester);
-router.get('/getSemester/:id', semesterController.getSemester);
+router.get('/:id', semesterController.get);
+router.get('/', semesterController.index);
 
 module.exports = router;

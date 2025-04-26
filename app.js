@@ -41,7 +41,7 @@ app.use('/markSplits', markSplitRoutes);
 app.use('/lectures', lectureRoutes);
 app.use('/exams', examRoutes);
 app.use('/enrollments', enrollmentRoutes);
-app.use('/enrollmentPrices', enrollmentPriceRoutes);
+app.use('/enrollmentprices', enrollmentPriceRoutes);
 app.use('/assignments', assignmentRoutes);
 app.use('/admin',adminRoutes)
 

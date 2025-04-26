@@ -9,8 +9,8 @@ router.post('/enrollment', studentController.createEnrollment);
 router.put('/updateStudent/:id', studentController.updateStudent);
 router.delete('/deleteStudent/:id', studentController.deleteStudent);
 router.get('/getStudentByName/:firstName/:lastName', studentController.getStudentByName);
-router.get('/getStudentById/:id', studentController.getStudentById);
-router.get('/getAllStudents', studentController.getAllStudents);
+router.get('/:id', studentController.get);
+router.get('/', studentController.index);
 
 
 module.exports = router;

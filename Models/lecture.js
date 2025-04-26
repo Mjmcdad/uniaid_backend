@@ -7,7 +7,7 @@ const Lecture = sequelize.define("Lecture", {
     primaryKey: true,
     autoIncrement: true,
   },
-  subjectOfferId: {
+  subjectId: {
     type: DataTypes.INTEGER,
     foreignKey: true,
   },
@@ -22,8 +22,10 @@ const Lecture = sequelize.define("Lecture", {
     type: DataTypes.STRING,
   },
   day: {
-    type: DataTypes.STRING,
-  }
+    type: DataTypes.ENUM("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
+    allowNull: false,
+  },
+  
 });
 
 module.exports = Lecture;

@@ -10,15 +10,16 @@ const TSection = sequelize.define('TSection', {
     subjectId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
+        unique: true
     },
     t_hours: {
         type: DataTypes.INTEGER,
         allowNull: true
     },
     time: {
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         allowNull: true
     }
-}); 
+});
 
 module.exports = TSection;

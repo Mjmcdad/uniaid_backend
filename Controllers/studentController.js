@@ -4,6 +4,7 @@ const EnrollmentPrice = require("../Models/enrollmentPrice");
 const Subject = require('../Models/subject')
 const SubjectOffer = require("../Models/subjectOffers")
 const Enrollment = require('../Models/enrollment')
+const { Op } = require('sequelize');
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("jsonwebtoken");
 const db = require('../config/dataBase')
@@ -207,7 +208,7 @@ const getStudentByName = async (req, res) => {
   }
 };
 
-const getStudentById = async (req, res) => {
+const get = async (req, res) => {
   const { id } = req.params;
   try {
     const student = await Student.findByPk(id, {
@@ -237,14 +238,56 @@ const getStudentById = async (req, res) => {
   }
 };
 
-const getAllStudents = async (req, res) => {
+const index = async (req, res) => {
   try {
-    const students = await Student.findAll();
+
+
+    const { academicYear, major, firstName, lastName, email, phoneNumber } = req.query;
+
+    StudentQueryOptions = {}
+
+    if (academicYear) {
+      StudentQueryOptions.academicYear = academicYear;
+    }
+    if (major) {
+      StudentQueryOptions.major = major;
+    }
+
+    const queryOptions = {
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName", "email", "phoneNumber"],
+          where: {},
+        },
+      ],
+      where: StudentQueryOptions,
+    };
+
+
+    if (firstName) {
+      queryOptions.include[0].where.firstName = { [Op.like]: `${firstName}%` };
+    }
+    if (lastName) {
+      queryOptions.include[0].where.lastName = { [Op.like]: `%${lastName}%` };
+    }
+    if (email) {
+      queryOptions.include[0].where.email = { [Op.like]: `%${email}%` };
+    }
+    if (phoneNumber) {
+      queryOptions.include[0].where.phoneNumber = { [Op.like]: `%${phoneNumber}%` };
+    }
+
+    const students = await Student.findAll(queryOptions);
+
     res.status(200).json(students);
+
   } catch (error) {
+
     res.status(500).json({ message: error.message });
   }
 };
+
 
 module.exports = {
   createStudent,
@@ -253,6 +296,6 @@ module.exports = {
   updateStudent,
   deleteStudent,
   getStudentByName,
-  getStudentById,
-  getAllStudents,
+  get,
+  index,
 };

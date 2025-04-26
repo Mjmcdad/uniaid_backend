@@ -10,11 +10,12 @@ const PTeacher = sequelize.define('pTeacher', {
     teacherId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
-        
+        allowNull: false
     },
     pSectionId: {
         type: DataTypes.INTEGER,
         foreignKey: true,
+        allowNull: false
     }
 });
 
