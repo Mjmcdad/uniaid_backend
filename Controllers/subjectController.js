@@ -28,7 +28,7 @@ const createSubject = async (req, res) => {
 const index = async (req, res) => {
     try {
 
-        const { name, academicYear, hasPractical, subjectType, hours, prerequisites, requiredFor } = req.query;
+        const { name, academicYear, hasPractical, subjectType, hours } = req.query;
 
         const queryOptions = {
             where: {},
@@ -52,6 +52,17 @@ const index = async (req, res) => {
 
                         }
                     ]
+                },
+                {
+                    model: Subject,
+                    as: 'required_for',
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: Subject,
+                    as: 'prerequisites',
+                    attributes: ['id', 'name']
+
                 }
             ]
 
@@ -75,14 +86,6 @@ const index = async (req, res) => {
 
         if (hours) {
             queryOptions.where.hours = hours;
-        }
-
-        if (prerequisites) {
-            queryOptions.where.prerequisites = { [Op.like]: `%${prerequisites}%` };
-        }
-
-        if (requiredFor) {
-            queryOptions.where.requiredFor = { [Op.like]: `%${requiredFor}%` };
         }
 
         const subjects = await Subject.findAll(queryOptions,);
@@ -115,8 +118,20 @@ const get = async (req, res) => {
                             model: Teacher,
                             include: User
 
-                        }
+                        },
+
                     ]
+                },
+                {
+                    model: Subject,
+                    as: 'required_for',
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: Subject,
+                    as: 'prerequisites',
+                    attributes: ['id', 'name']
+
                 }
             ]
         });

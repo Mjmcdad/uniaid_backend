@@ -71,6 +71,8 @@ async function insertLectures() {
                     start_time: startTime,
                     end_time: endTime,
                     day: day,
+                    teacherId: getRandomNumber(1, 8),
+                    groups: getRandomGroups()
                 };
 
                 lectures.push(lecture);
@@ -84,6 +86,12 @@ async function insertLectures() {
     } catch (error) {
         console.error('Error seeding lectures:', error);
     }
+}
+
+const getRandomGroups = () => {
+    const groups = []
+    groups.push(getRandomNumber(1, 3))
+    return groups;
 }
 
 module.exports = {

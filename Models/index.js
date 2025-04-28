@@ -52,8 +52,8 @@ const initModels = async () => {
     Student.belongsToMany(Subject, { through: Transaction, foreignKey: 'studentId', onDelete: 'CASCADE' });
     Subject.belongsToMany(Student, { through: Transaction, foreignKey: 'subjectId', onDelete: 'CASCADE' });
 
-    StudentMark.hasOne(Enrollment, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
-    Enrollment.belongsTo(StudentMark, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
+    StudentMark.belongsTo(Enrollment, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
+    Enrollment.hasOne(StudentMark, { foreignKey: 'enrollmentId', onDelete: 'CASCADE' });
 
 
     SubjectOffer.hasMany(Exam, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
@@ -74,6 +74,8 @@ const initModels = async () => {
 
     SubjectOffer.belongsTo(Subject, { foreignKey: 'subjectId' });
 
+    Lecture.belongsTo(Teacher, { foreignKey: "teacherId", onDelete: "CASCADE" })
+    Teacher.hasMany(Lecture, { foreignKey: 'teacherId', onDelete: "CASCADE" })
 
     SubjectOffer.hasMany(Enrollment, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });
     Enrollment.belongsTo(SubjectOffer, { foreignKey: 'subjectOfferId', onDelete: 'CASCADE' });

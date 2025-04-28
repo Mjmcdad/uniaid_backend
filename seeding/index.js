@@ -8,7 +8,7 @@ const { insertSubjectOffers } = require("./insertSubjectOffer")
 const { insertRandomSemesters } = require('./insertSemesters')
 const { insertRandomSectionsAndTeachers } = require('./insertSections')
 const { insertRooms } = require("./inserRooms")
-const { inserStudents } = require("./insertStudents")
+const { insertStudents } = require("./insertStudents")
 const { insertEnrollmentsAndMarks } = require('./insertEnrollmentsAndMarks')
 const { insertLectures } = require('./insertLectures')
 
@@ -51,7 +51,7 @@ async function seed() {
 
         await insertRooms();
 
-        await inserStudents();
+        await insertStudents();
 
         await insertEnrollmentsAndMarks();
 

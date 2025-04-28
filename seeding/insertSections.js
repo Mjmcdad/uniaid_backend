@@ -8,8 +8,10 @@ const PTeacher = require('../Models/pTeacher');
 async function insertRandomSectionsAndTeachers() {
     try {
         // Step 1: Retrieve all subjects and teachers from the database
-        const subjects = await Subject.findAll();
-        const teachers = await Teacher.findAll();
+        const [subjects, teachers] = await Promise.all([
+            Subject.findAll(),
+            Teacher.findAll()
+        ]);
 
         if (subjects.length === 0) {
             console.error('No subjects found in the database. Please insert subjects first.');
@@ -21,40 +23,65 @@ async function insertRandomSectionsAndTeachers() {
             return;
         }
 
-        // Step 2: Insert one TSection and one PSection (if applicable) for each subject
+        // Arrays to hold data for bulk creation
+        const tSections = [];
+        const pSections = [];
+        const tTeachers = [];
+        const pTeachers = [];
+
+        // Step 2: Prepare data for theoretical and practical sections
         for (const subject of subjects) {
             // Create one theoretical section for the subject
-            const tSection = await TSection.create({
+            const tSectionData = {
                 subjectId: subject.id,
                 t_hours: getRandomHours(),
                 time: getRandomTime(), // Random time in HH:mm:ss format
-            });
+            };
+            tSections.push(tSectionData);
 
             // Assign one random teacher to the theoretical section
             const randomTeacherForT = teachers[Math.floor(Math.random() * teachers.length)];
-            await TTeacher.create({
+            tTeachers.push({
                 teacherId: randomTeacherForT.id,
-                tSectionId: tSection.id,
+                tSectionId: tSections.length, // Use the index as a placeholder for tSectionId
             });
 
             // If the subject has practical sessions, create one practical section
             if (subject.hasPractical) {
-                const pSection = await PSection.create({
+                const pSectionData = {
                     subjectId: subject.id,
                     p_hours: getRandomHours(),
                     time: getRandomTime(), // Random time in HH:mm:ss format
-                });
+                };
+                pSections.push(pSectionData);
 
                 // Assign one random teacher to the practical section
                 const randomTeacherForP = teachers[Math.floor(Math.random() * teachers.length)];
-                await PTeacher.create({
+                pTeachers.push({
                     teacherId: randomTeacherForP.id,
-                    pSectionId: pSection.id,
+                    pSectionId: pSections.length, // Use the index as a placeholder for pSectionId
                 });
             } else {
                 console.log(`Subject ${subject.name} does not have practical sessions. Skipping PSection creation.`);
             }
         }
+
+        // Step 3: Perform bulk inserts
+        const createdTSections = await TSection.bulkCreate(tSections);
+        const createdPSections = await PSection.bulkCreate(pSections);
+
+        // Update tSectionId and pSectionId in tTeachers and pTeachers arrays
+        createdTSections.forEach((tSection, index) => {
+            tTeachers[index].tSectionId = tSection.id;
+        });
+
+        createdPSections.forEach((pSection, index) => {
+            pTeachers[index].pSectionId = pSection.id;
+        });
+
+        // Bulk insert teachers for theoretical and practical sections
+        await TTeacher.bulkCreate(tTeachers);
+        await PTeacher.bulkCreate(pTeachers);
 
         console.log('Random sections and teachers successfully inserted into the database.');
     } catch (error) {

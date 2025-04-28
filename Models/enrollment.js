@@ -21,8 +21,11 @@ const Enrollment = sequelize.define('Enrollment', {
         allowNull: true
     },
     status: {
-        type: DataTypes.ENUM('Enrolled', 'Failed', 'Passed','OnHold'),
+        type: DataTypes.ENUM('Enrolled', 'Failed', 'Passed', 'OnHold'),
         allowNull: false
+    },
+    group: {
+        type: DataTypes.INTEGER,
     }
 });
 

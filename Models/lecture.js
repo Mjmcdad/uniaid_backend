@@ -11,6 +11,10 @@ const Lecture = sequelize.define("Lecture", {
     type: DataTypes.INTEGER,
     foreignKey: true,
   },
+  teacherId: {
+    type: DataTypes.INTEGER,
+    foreignKey: true,
+  },
   roomId: {
     type: DataTypes.INTEGER,
     foreignKey: true,
@@ -25,7 +29,10 @@ const Lecture = sequelize.define("Lecture", {
     type: DataTypes.ENUM("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"),
     allowNull: false,
   },
-  
+  groups: {
+    type: DataTypes.JSON
+  }
+
 });
 
 module.exports = Lecture;

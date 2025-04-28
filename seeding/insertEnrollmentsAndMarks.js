@@ -30,13 +30,14 @@ function calculateGPA(totalMarksArray) {
 
 async function insertEnrollmentsAndMarks() {
     try {
-        // Step 1: Retrieve all students and subject offers
-        const students = await Student.findAll();
-        const subjectOffers = await SubjectOffer.findAll({
-            where: {
-                isAvailable: true
-            }
-        });
+        // Step 1: Retrieve all students, subject offers, subjects, semesters, and enrollment prices
+        const [students, subjectOffers, subjects, semesters, enrollmentPrices] = await Promise.all([
+            Student.findAll(),
+            SubjectOffer.findAll({ where: { isAvailable: true } }),
+            Subject.findAll(),
+            Semester.findAll(),
+            EnrollmentPrice.findAll()
+        ]);
 
         if (students.length === 0) {
             console.error('No students found in the database. Please insert students first.');
@@ -48,30 +49,35 @@ async function insertEnrollmentsAndMarks() {
             return;
         }
 
+        // Create maps for quick lookup
+        const subjectMap = new Map(subjects.map(subject => [subject.id, subject]));
+        const semesterMap = new Map(semesters.map(semester => [semester.id, semester]));
+        const enrollmentPriceMap = new Map(enrollmentPrices.map(price => [price.id, price]));
+
         // Step 2: Create enrollments and marks for each student
         for (const student of students) {
             const totalMarksForGPA = [];
             let totalHoursAchieved = 0;
 
+            // Get the enrollment price for the current student
+            const enrollmentPrice = enrollmentPriceMap.get(student.enrollmentPriceId);
+            if (!enrollmentPrice) {
+                console.log(`Enrollment price with ID ${student.enrollmentPriceId} not found. Skipping student ${student.id}.`);
+                continue;
+            }
+
             for (const subjectOffer of subjectOffers) {
-                // Retrieve the subject details
-                const subject = await Subject.findOne({ where: { id: subjectOffer.subjectId } });
+                // Retrieve the subject details from the map
+                const subject = subjectMap.get(subjectOffer.subjectId);
                 if (!subject) {
                     console.log(`Subject with ID ${subjectOffer.subjectId} not found. Skipping enrollment.`);
                     continue;
                 }
 
-                // Retrieve the semester details
-                const semester = await Semester.findOne({ where: { id: subjectOffer.semesterId } });
+                // Retrieve the semester details from the map
+                const semester = semesterMap.get(subjectOffer.semesterId);
                 if (!semester) {
                     console.log(`Semester with ID ${subjectOffer.semesterId} not found. Skipping enrollment.`);
-                    continue;
-                }
-
-                // Retrieve the enrollment price details
-                const enrollmentPrice = await EnrollmentPrice.findOne({ where: { id: student.enrollmentPriceId } });
-                if (!enrollmentPrice) {
-                    console.log(`Enrollment price with ID ${student.enrollmentPriceId} not found. Skipping enrollment.`);
                     continue;
                 }
 
@@ -119,7 +125,8 @@ async function insertEnrollmentsAndMarks() {
                     studentId: student.id,
                     subjectOfferId: subjectOffer.id,
                     isQualified: true,
-                    status: status // Status depends on the total mark
+                    status: status, // Status depends on the total mark
+                    group: getRandomMark(1, 3)
                 });
 
                 // Store the total mark for GPA calculation if the student passed
@@ -156,7 +163,6 @@ async function insertEnrollmentsAndMarks() {
         console.error('Error seeding enrollments and marks:', error);
     }
 }
-
 
 module.exports = {
     insertEnrollmentsAndMarks

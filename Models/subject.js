@@ -15,13 +15,13 @@ const Subject = sequelize.define('Subject', {
         type: DataTypes.TEXT,
         allowNull: false
     },
-    prerequisites: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    requiredFor: {
-        type: DataTypes.STRING,
-        allowNull: true
+    prerequisitesId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'Subjects',
+            key: 'id'
+        }
     },
     subjectType: {
         type: DataTypes.STRING,
@@ -30,7 +30,7 @@ const Subject = sequelize.define('Subject', {
     hours: {
         type: DataTypes.INTEGER,
         allowNull: false
-    },  
+    },
     academicYear: {
         type: DataTypes.INTEGER,
         allowNull: false
@@ -39,6 +39,13 @@ const Subject = sequelize.define('Subject', {
         type: DataTypes.BOOLEAN,
         allowNull: false
     }
+}, {
+    tableName: 'Subjects',
+    timestamps: true
 });
+
+
+Subject.hasMany(Subject, { as: "required_for", foreignKey: 'prerequisitesId', onDelete: "CASCADE" });
+Subject.belongsTo(Subject, { as: "prerequisites", foreignKey: 'prerequisitesId', onDelete: "CASCADE" });
 
 module.exports = Subject;

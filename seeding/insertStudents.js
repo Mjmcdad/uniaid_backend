@@ -7,8 +7,8 @@ const bcrypt = require("bcrypt-nodejs");
 
 // Helper functions to generate values
 function getArabicNamesInOrder(index) {
-    const arabicFirstNames = ["محمد", "علي", "أحمد", "فاطمة", "سارة", "خالد", "عمر", "ليلى", "مريم", "يوسف"];
-    const arabicLastNames = ["الحاج", "السيد", "إبراهيم", "عبدالله", "حسن", "مصطفى", "جمال", "رضا", "سعيد", "أمين"];
+    const arabicFirstNames = ["محمد", "علي", "أحمد", "فاطمة", "عمر", "ليلى", "مريم"];
+    const arabicLastNames = ["الحاج", "السيد", "إبراهيم", "عبدالله", "مصطفى", "جمال", "رضا"];
 
     // Use modulo to loop through the arrays if the index exceeds their length
     const firstName = arabicFirstNames[index % arabicFirstNames.length];
@@ -23,22 +23,16 @@ const arabicToEnglishMap = {
     "علي": "Ali",
     "أحمد": "Ahmad",
     "فاطمة": "Fatima",
-    "سارة": "Sara",
-    "خالد": "Khaled",
     "عمر": "Omar",
     "ليلى": "Layla",
     "مريم": "Maryam",
-    "يوسف": "Youssef",
     "الحاج": "Haj",
     "السيد": "El-Sayed",
     "إبراهيم": "Ibrahim",
     "عبدالله": "Abdullah",
-    "حسن": "Hassan",
     "مصطفى": "Mustafa",
     "جمال": "Jamal",
     "رضا": "Reda",
-    "سعيد": "Saeed",
-    "أمين": "Ameen"
 };
 
 function getEmail(firstName, lastName) {
@@ -58,39 +52,45 @@ function getMajor() {
     return majors[Math.floor(Math.random() * majors.length)];
 }
 
-async function inserStudents() {
+const insertStudents = async () => {
     try {
         const numberOfStudents = 15;
+
+        // Fetch all enrollment prices outside the loop
+        const enrollmentPrices = await EnrollmentPrice.findAll();
+        if (enrollmentPrices.length === 0) {
+            console.error("No enrollment prices found in the database. Please insert enrollment prices first.");
+            return;
+        }
+
+        // Prepare arrays for bulk creation
+        const users = [];
         const students = [];
 
         for (let i = 0; i < numberOfStudents; i++) {
             // Get Arabic names in order
             const { firstName, lastName } = getArabicNamesInOrder(i);
 
-            // Create a user record
-            const user = await User.create({
+            // Create user data
+            const user = {
                 firstName,
                 lastName,
                 email: getEmail(firstName, lastName), // Use English-friendly email
                 password: bcrypt.hashSync("123456789"),
                 phoneNumber: "0999999999",
                 role: "student",
-            });
+            };
+
+            // Push user data to the array
+            users.push(user);
 
             // Randomly assign an enrollment price ID
-            const enrollmentPriceId = Math.floor(Math.random() * 5) + 1; // Assuming there are 5 enrollment prices
-
-            // Retrieve the academic year from the enrollment price
-            const enrollmentPrice = await EnrollmentPrice.findOne({ where: { id: enrollmentPriceId } });
-            if (!enrollmentPrice) {
-                console.error(`Enrollment price with ID ${enrollmentPriceId} not found. Skipping student creation.`);
-                continue;
-            }
+            const randomIndex = Math.floor(Math.random() * enrollmentPrices.length);
+            const enrollmentPrice = enrollmentPrices[randomIndex];
 
             // Generate student-specific fields
             const student = {
-                userId: user.id,
-                enrollmentPriceId: enrollmentPriceId,
+                enrollmentPriceId: enrollmentPrice.id,
                 socialNumber: getSocialNumber(),
                 hoursAchieved: 0,
                 gpa: 0,
@@ -99,10 +99,19 @@ async function inserStudents() {
                 balance: parseFloat((Math.random() * 10000).toFixed(2)), // Random balance up to 10,000
             };
 
+            // Push student data to the array (userId will be added later)
             students.push(student);
         }
 
-        // Bulk insert all students into the database
+        // Bulk create users
+        const createdUsers = await User.bulkCreate(users);
+
+        // Assign userIds to students
+        createdUsers.forEach((user, index) => {
+            students[index].userId = user.id;
+        });
+
+        // Bulk create students
         await Student.bulkCreate(students);
 
         console.log(`${numberOfStudents} students successfully inserted into the database.`);
@@ -112,5 +121,5 @@ async function inserStudents() {
 }
 
 module.exports = {
-    inserStudents
+    insertStudents
 };

@@ -1,12 +1,10 @@
+const Semester = require('../Models/semester');
+const SubjectOffer = require('../Models/subjectOffers');
+const Subject = require('../Models/subject');
 
-const Semester = require('../Models/semester')
-const SubjectOffer = require('../Models/subjectOffers')
-const Subject = require('../Models/subject')
-
-// Function to insert subject offers
+// Function to insert subject offers using bulkCreate
 async function insertSubjectOffers() {
     try {
-        
         // Step 1: Retrieve all subjects from the database
         const subjects = await Subject.findAll();
         if (subjects.length === 0) {
@@ -21,23 +19,28 @@ async function insertSubjectOffers() {
             return;
         }
 
+        // Step 3: Prepare an array for bulk creation
+        const subjectOffers = [];
 
-        // Step 3: Insert subject offers
+        // Step 4: Generate subject offers
         for (const dbSubject of subjects) {
             // Randomly assign the subject to some semesters
             const numberOfSemesters = Math.floor(Math.random() * semesters.length) + 1; // Assign to 1+ semesters
             const selectedSemesters = semesters.sort(() => 0.5 - Math.random()).slice(0, numberOfSemesters);
 
             for (const semester of selectedSemesters) {
-                await SubjectOffer.create({
+                subjectOffers.push({
                     subjectId: dbSubject.id,
                     semesterId: semester.id,
-                    isAvailable: Math.random() < 0.8 // 80% chance of being available
+                    isAvailable: Math.random() < 0.8, // 80% chance of being available
                 });
             }
         }
 
-        console.log('Subject offers successfully inserted into the database.');
+        // Step 5: Perform bulk insert
+        await SubjectOffer.bulkCreate(subjectOffers);
+
+        console.log(`${subjectOffers.length} subject offers successfully inserted into the database.`);
     } catch (error) {
         console.error('Error inserting subject offers:', error);
     }
@@ -45,4 +48,4 @@ async function insertSubjectOffers() {
 
 module.exports = {
     insertSubjectOffers
-}
+};

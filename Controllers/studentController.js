@@ -8,7 +8,8 @@ const { Op } = require('sequelize');
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("jsonwebtoken");
 const db = require('../config/dataBase')
-
+const Transactions = require('../Models/transactions');
+const DateNow = require("date/Date.now");
 
 const createStudent = async (req, res) => {
   const {
@@ -110,103 +111,12 @@ const login = async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
+    console.log(error)
+
     res.status(500).json({ message: error.message });
   }
 };
 
-const createEnrollment = async (req, res) => {
-  const { studentId, subjectOfferId, enrollmentDate, isQualified, status } = req.body;
-  try {
-    const student = await Student.findByPk(studentId);
-    const subject_offer = await SubjectOffer.findByPk(subjectOfferId);
-    if (!subject_offer.isAvailable)
-      throw new Error("this subject isn`t available");
-
-    const subject = await Subject.findByPk(subject_offer.subjectId);
-
-    if (subject.academicYear > student.academicYear)
-      throw new Error("this subject is for higher academic year")
-
-    const enrollment_price = (await EnrollmentPrice.findByPk(student.enrollmentPriceId)).price
-    if (student.balance < enrollment_price)
-      throw new Error("the student doesn`t have enogh money")
-
-    const enrollment = await Enrollment.create({ studentId, subjectOfferId, enrollmentDate, isQualified, status });
-
-    res.status(201).json(enrollment);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-const updateStudent = async (req, res) => {
-  const { id } = req.params;
-  const {
-    firstName,
-    lastName,
-    enrollmentPriceId,
-    socialNumber,
-    hoursAchieved,
-    gpa,
-    email,
-    password,
-    phoneNumber,
-    academicYear,
-    enrollmentDate,
-    major,
-    balance,
-  } = req.body;
-  try {
-    const [updated] = await Student.update(
-      {
-        firstName,
-        lastName,
-        enrollmentPriceId,
-        socialNumber,
-        hoursAchieved,
-        gpa,
-        email,
-        password,
-        phoneNumber,
-        academicYear,
-        enrollmentDate,
-        major,
-        balance,
-      },
-      { where: { id } }
-    );
-
-    if (updated) {
-      const updatedStudent = await Student.findByPk(id);
-      res.status(200).json(updatedStudent);
-    } else {
-      res.status(404).json({ message: "Student not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const deleteStudent = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const student = await Student.destroy({ where: { id } });
-    res.status(200).json(student);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const getStudentByName = async (req, res) => {
-  const { firstName, lastName } = req.params;
-  try {
-    const student = await Student.findAll({ where: { firstName, lastName } });
-    res.status(200).json(student);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 const get = async (req, res) => {
   const { id } = req.params;
@@ -234,6 +144,8 @@ const get = async (req, res) => {
 
     res.status(200).json(studentData);
   } catch (error) {
+    console.log(error)
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -283,19 +195,127 @@ const index = async (req, res) => {
     res.status(200).json(students);
 
   } catch (error) {
+    console.log(error)
 
     res.status(500).json({ message: error.message });
   }
 };
 
 
+const createEnrollment = async (req, res) => {
+  const { studentId, subjectOfferId, enrollmentDate, isQualified, status, group } = req.body;
+  try {
+    const student = await Student.findByPk(studentId);
+    if (!student)
+      throw new Error("student not found")
+
+    const subject_offer = await SubjectOffer.findByPk(subjectOfferId);
+
+    if (!subject_offer.isAvailable)
+      throw new Error("this subject isn`t available");
+
+    const subject = await Subject.findByPk(subject_offer.subjectId);
+
+    if (subject.prerequisitesId) {
+      const s = await Subject.findByPk(subject.prerequisitesId)
+      const preq = await Enrollment.findOne({
+        where: {
+          studentId: student.id,
+          status: 'passed',
+        },
+        include: [
+          {
+            model: SubjectOffer,
+            where: {
+              subjectId: subject.id
+            }
+          }
+        ]
+      })
+      if (!preq)
+        throw new Error(`you didnt meet the requirments , pass ${s.name} first`)
+
+    }
+
+    if (subject.academicYear > student.academicYear)
+      throw new Error("this subject is for higher academic year")
+
+    const enrollment_price = (await EnrollmentPrice.findByPk(student.enrollmentPriceId)).price
+
+    if (student.balance < enrollment_price)
+      throw new Error("the student doesn`t have enogh money")
+
+    student.balance -= enrollment_price;
+
+    const transaction = await Transactions.create({ subjectId: subject.id, studentId: studentId, amount: enrollment_price, transactionDate: DateNow() })
+
+    if (!transaction)
+      throw new Error("transaction didn`t happen")
+
+    student.save();
+
+
+    const enrollment = await Enrollment.create({ studentId, subjectOfferId, enrollmentDate, isQualified, status, group });
+
+    res.status(201).json(enrollment);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const updateEnrollment = async (req, res) => {
+  const { isQualified, status, group } = req.body; // Extract fields from request body
+  const { id } = req.params; // Extract enrollment ID from request parameters
+
+  try {
+
+    const enrollment = await Enrollment.findByPk(id);
+
+    if (!enrollment) {
+      return res.status(404).json({ message: 'Enrollment not found' });
+    }
+
+    enrollment.isQualified = isQualified !== undefined ? isQualified : enrollment.isQualified;
+    enrollment.status = status !== undefined ? status : enrollment.status;
+    enrollment.group = group !== undefined ? group : enrollment.group;
+
+    await enrollment.save();
+
+    res.status(200).json({
+      message: 'Enrollment updated successfully',
+      data: enrollment,
+    });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message });
+
+  }
+};
+
+const getEnrollments = async (req, res) => {
+  const { id } = req.params
+  try {
+    const enrollments = await Enrollment.findAll({
+      where: {
+        studentId: id
+      }
+    })
+    res.status(200).json(enrollments);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
 module.exports = {
   createStudent,
   login,
-  createEnrollment,
-  updateStudent,
-  deleteStudent,
-  getStudentByName,
   get,
   index,
+  createEnrollment,
+  updateEnrollment,
+  getEnrollments
 };
