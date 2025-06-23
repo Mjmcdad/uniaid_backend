@@ -1,15 +1,18 @@
 const User = require("../Models/user");
 const Student = require("../Models/student");
 const EnrollmentPrice = require("../Models/enrollmentPrice");
-const Subject = require('../Models/subject')
-const SubjectOffer = require("../Models/subjectOffers")
-const Enrollment = require('../Models/enrollment')
-const { Op } = require('sequelize');
+const Subject = require("../Models/subject");
+const SubjectOffer = require("../Models/subjectOffers");
+const Enrollment = require("../Models/enrollment");
+const { Op } = require("sequelize");
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("jsonwebtoken");
-const db = require('../config/dataBase')
-const Transactions = require('../Models/transactions');
+const db = require("../config/dataBase");
+const sequelize = require("sequelize");
+const Transactions = require("../Models/transactions");
 const DateNow = require("date/Date.now");
+const Semester = require("../Models/semester");
+const StudentMark = require("../Models/studentMark");
 
 const createStudent = async (req, res) => {
   const {
@@ -26,7 +29,7 @@ const createStudent = async (req, res) => {
   } = req.body;
 
   // Start a transaction
-  const t = await db.transaction()
+  const t = await db.transaction();
 
   try {
     // Hash the password
@@ -93,10 +96,7 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid ID or password" });
     }
 
-    const isPasswordValid = bcrypt.compareSync(
-      password,
-      student.User.password
-    );
+    const isPasswordValid = bcrypt.compareSync(password, student.User.password);
 
     if (!isPasswordValid) {
       console.log("Invalid password");
@@ -111,12 +111,11 @@ const login = async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
-    console.log(error)
+    console.log(error);
 
     res.status(500).json({ message: error.message });
   }
 };
-
 
 const get = async (req, res) => {
   const { id } = req.params;
@@ -144,7 +143,7 @@ const get = async (req, res) => {
 
     res.status(200).json(studentData);
   } catch (error) {
-    console.log(error)
+    console.log(error);
 
     res.status(500).json({ message: error.message });
   }
@@ -152,11 +151,10 @@ const get = async (req, res) => {
 
 const index = async (req, res) => {
   try {
+    const { academicYear, major, firstName, lastName, email, phoneNumber } =
+      req.query;
 
-
-    const { academicYear, major, firstName, lastName, email, phoneNumber } = req.query;
-
-    StudentQueryOptions = {}
+    StudentQueryOptions = {};
 
     if (academicYear) {
       StudentQueryOptions.academicYear = academicYear;
@@ -176,7 +174,6 @@ const index = async (req, res) => {
       where: StudentQueryOptions,
     };
 
-
     if (firstName) {
       queryOptions.include[0].where.firstName = { [Op.like]: `${firstName}%` };
     }
@@ -187,27 +184,33 @@ const index = async (req, res) => {
       queryOptions.include[0].where.email = { [Op.like]: `%${email}%` };
     }
     if (phoneNumber) {
-      queryOptions.include[0].where.phoneNumber = { [Op.like]: `%${phoneNumber}%` };
+      queryOptions.include[0].where.phoneNumber = {
+        [Op.like]: `%${phoneNumber}%`,
+      };
     }
 
     const students = await Student.findAll(queryOptions);
 
     res.status(200).json(students);
-
   } catch (error) {
-    console.log(error)
+    console.log(error);
 
     res.status(500).json({ message: error.message });
   }
 };
 
-
 const createEnrollment = async (req, res) => {
-  const { studentId, subjectOfferId, enrollmentDate, isQualified, status, group } = req.body;
+  const {
+    studentId,
+    subjectOfferId,
+    enrollmentDate,
+    isQualified,
+    status,
+    group,
+  } = req.body;
   try {
     const student = await Student.findByPk(studentId);
-    if (!student)
-      throw new Error("student not found")
+    if (!student) throw new Error("student not found");
 
     const subject_offer = await SubjectOffer.findByPk(subjectOfferId);
 
@@ -217,49 +220,62 @@ const createEnrollment = async (req, res) => {
     const subject = await Subject.findByPk(subject_offer.subjectId);
 
     if (subject.prerequisitesId) {
-      const s = await Subject.findByPk(subject.prerequisitesId)
+      const s = await Subject.findByPk(subject.prerequisitesId);
       const preq = await Enrollment.findOne({
         where: {
           studentId: student.id,
-          status: 'passed',
+          status: "passed",
         },
         include: [
           {
             model: SubjectOffer,
             where: {
-              subjectId: subject.id
-            }
-          }
-        ]
-      })
+              subjectId: subject.id,
+            },
+          },
+        ],
+      });
       if (!preq)
-        throw new Error(`you didnt meet the requirments , pass ${s.name} first`)
-
+        throw new Error(
+          `you didnt meet the requirments , pass ${s.name} first`
+        );
     }
 
     if (subject.academicYear > student.academicYear)
-      throw new Error("this subject is for higher academic year")
+      throw new Error("this subject is for higher academic year");
 
-    const enrollment_price = (await EnrollmentPrice.findByPk(student.enrollmentPriceId)).price
+    const enrollment_price = (
+      await EnrollmentPrice.findByPk(student.enrollmentPriceId)
+    ).price;
 
     if (student.balance < enrollment_price)
-      throw new Error("the student doesn`t have enogh money")
+      throw new Error("the student doesn`t have enogh money");
 
     student.balance -= enrollment_price;
 
-    const transaction = await Transactions.create({ subjectId: subject.id, studentId: studentId, amount: enrollment_price, transactionDate: DateNow() })
+    const transaction = await Transactions.create({
+      subjectId: subject.id,
+      studentId: studentId,
+      amount: enrollment_price,
+      transactionDate: DateNow(),
+    });
 
-    if (!transaction)
-      throw new Error("transaction didn`t happen")
+    if (!transaction) throw new Error("transaction didn`t happen");
 
     student.save();
 
-
-    const enrollment = await Enrollment.create({ studentId, subjectOfferId, enrollmentDate, isQualified, status, group });
+    const enrollment = await Enrollment.create({
+      studentId,
+      subjectOfferId,
+      enrollmentDate,
+      isQualified,
+      status,
+      group,
+    });
 
     res.status(201).json(enrollment);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -269,46 +285,135 @@ const updateEnrollment = async (req, res) => {
   const { id } = req.params; // Extract enrollment ID from request parameters
 
   try {
-
     const enrollment = await Enrollment.findByPk(id);
 
     if (!enrollment) {
-      return res.status(404).json({ message: 'Enrollment not found' });
+      return res.status(404).json({ message: "Enrollment not found" });
     }
 
-    enrollment.isQualified = isQualified !== undefined ? isQualified : enrollment.isQualified;
+    enrollment.isQualified =
+      isQualified !== undefined ? isQualified : enrollment.isQualified;
     enrollment.status = status !== undefined ? status : enrollment.status;
     enrollment.group = group !== undefined ? group : enrollment.group;
 
     await enrollment.save();
 
     res.status(200).json({
-      message: 'Enrollment updated successfully',
+      message: "Enrollment updated successfully",
       data: enrollment,
     });
-
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: error.message });
-
   }
 };
 
 const getEnrollments = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
   try {
     const enrollments = await Enrollment.findAll({
       where: {
-        studentId: id
-      }
-    })
+        studentId: id,
+      },
+    });
     res.status(200).json(enrollments);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
-}
+};
 
+const getAcadamicLife = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const student = await Student.findByPk(id, {
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName", "email", "phoneNumber"],
+        },
+      ],
+    });
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const enrollmentYear = new Date(student.enrollmentDate).getFullYear();
+
+    const semesters = await Semester.findAll({
+      where: {
+        year: {
+          [sequelize.Op.gte]: enrollmentYear,
+        },
+      },
+      include: [
+        {
+          model: SubjectOffer,
+          include: [
+            {
+              model: Enrollment,
+              where: {
+                studentId: id,
+              },
+              include: [{ model: StudentMark }],
+            },
+            {
+              model: Subject,
+            },
+          ],
+        },
+      ],
+      order: [["startDate", "ASC"]],
+    });
+
+    // Process each semester and collect GPA data
+    const processedSemesters = semesters.map((semester) => {
+      let totalWeightedScore = 0;
+      let totalHours = 0;
+
+      semester.SubjectOffers.forEach((subjectOffer) => {
+        const enrollment = subjectOffer.Enrollments[0]; // assuming one enrollment per subject
+        const studentMark = enrollment?.StudentMark;
+        const subject = subjectOffer.Subject;
+
+        if (studentMark && subject) {
+          const totalMark = studentMark.totalMark;
+          const hours = subject.hours;
+
+          totalWeightedScore += totalMark * hours;
+          totalHours += hours;
+        }
+      });
+
+      const semesterGpa = totalHours > 0 ? totalWeightedScore / totalHours : 0;
+
+      return {
+        ...semester.toJSON(),
+        gpa: semesterGpa.toFixed(2),
+      };
+    });
+
+    // Get the most recent semester (last one after sorting by startDate)
+    const latestSemester = processedSemesters[processedSemesters.length - 1];
+
+    if (latestSemester && latestSemester.gpa) {
+      // Update the student's GPA with the GPA from the latest semester
+      await student.update({ gpa: parseFloat(latestSemester.gpa) });
+    }
+
+    const studentData = {
+      studentInfo: student,
+      semesters: processedSemesters,
+    };
+
+    res.status(200).json(studentData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   createStudent,
@@ -317,5 +422,6 @@ module.exports = {
   index,
   createEnrollment,
   updateEnrollment,
-  getEnrollments
+  getEnrollments,
+  getAcadamicLife,
 };
