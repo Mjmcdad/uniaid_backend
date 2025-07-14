@@ -10,10 +10,16 @@ const User = sequelize.define("User", {
   firstName: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      len: [3, 20],
+    },
   },
   lastName: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      len: [3, 20],
+    },
   },
   email: {
     type: DataTypes.STRING,
@@ -30,6 +36,9 @@ const User = sequelize.define("User", {
   phoneNumber: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      len: [8, 10],
+    },
   },
   role: {
     type: DataTypes.ENUM("admin", "student", "teacher"),
