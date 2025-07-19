@@ -3,7 +3,7 @@ const Tsection = require("../Models/tSection");
 const Psection = require("../Models/pSection");
 const Tteacher = require("../Models/tTeacher");
 const Pteacher = require("../Models/pTeacher");
-const User = require("../Models/user")
+const User = require("../Models/user");
 
 const createTeacher = async (req, res) => {
   const { firstName, lastName, email, password, phoneNumber } = req.body;
@@ -52,19 +52,11 @@ const deleteTeacher = async (req, res) => {
   }
 };
 
-const getTeacherByName = async (req, res) => {
-  const { firstName, lastName } = req.params;
-  try {
-    const teacher = await Teacher.findAll({ where: { firstName, lastName } });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 const getTeacherById = async (req, res) => {
   const { id } = req.params;
   try {
     const teacher = await Teacher.findByPk(id);
+    res.status(200).json(teacher);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -73,6 +65,7 @@ const getTeacherById = async (req, res) => {
 const getAllTeachers = async (req, res) => {
   try {
     const teachers = await Teacher.findAll();
+    res.status(200).json(teachers);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -102,7 +95,6 @@ module.exports = {
   createTeacher,
   updateTeacher,
   deleteTeacher,
-  getTeacherByName,
   getTeacherById,
   getAllTeachers,
   createTteacher,

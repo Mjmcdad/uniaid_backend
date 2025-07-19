@@ -94,7 +94,7 @@ const index = async (req, res) => {
           ],
         },
       ],
-      order: [["start_time", "ASC"]], // Add this line
+      order: [["start_time", "ASC"]],
     });
 
     res.status(200).json(lectures);
