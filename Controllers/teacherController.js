@@ -4,6 +4,7 @@ const Psection = require("../Models/pSection");
 const Tteacher = require("../Models/tTeacher");
 const Pteacher = require("../Models/pTeacher");
 const User = require("../Models/user");
+const bcrypt = require("bcrypt-nodejs");
 
 const createTeacher = async (req, res) => {
   const { firstName, lastName, email, password, phoneNumber } = req.body;
