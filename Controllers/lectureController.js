@@ -97,11 +97,14 @@ const index = async (req, res) => {
         {
           model: Teacher,
           required: true,
+          required: true,
           attributes: ["id"],
           include: [
             {
               model: User,
               attributes: ["id", "firstName", "lastName"],
+              where: teacherWhere,
+              required: true,
               where: teacherWhere,
               required: true,
             },
