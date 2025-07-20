@@ -32,9 +32,11 @@ const create = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-    const { roomId, day, subjectId, start_time, end_time, group } = req.query;
+    const { roomId, day, subjectId, start_time, end_time, group, teacher } =
+      req.query;
 
     const whereClause = {};
+    const teacherWhere = {};
 
     // Add filters based on query parameters
     if (roomId) {
@@ -45,6 +47,9 @@ const index = async (req, res) => {
     }
     if (subjectId) {
       whereClause.subjectId = subjectId;
+    }
+    if (teacher) {
+      teacherWhere.firstName = { [Op.like]: `%${teacher}%` }; // Find where firstName ≠ teacher
     }
     if (start_time && end_time) {
       whereClause.start_time = {
@@ -85,11 +90,14 @@ const index = async (req, res) => {
         },
         {
           model: Teacher,
+          required: true,
           attributes: ["id"],
           include: [
             {
               model: User,
               attributes: ["id", "firstName", "lastName"],
+              where: teacherWhere,
+              required: true,
             },
           ],
         },
